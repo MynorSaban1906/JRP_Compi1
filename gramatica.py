@@ -19,7 +19,16 @@ tokens  = [
     'DIVIDIDO',
     'MENQUE',
     'MAYQUE',
+    'MODULO',
+    'MENIGUAL',
+    'MAYIGUAL'
     'IGUALIGUAL',
+    'DIFERENTE',
+
+
+    'SNOT',
+    'SAND',
+    'SOR'
     'DECIMAL',
     'ENTERO',
     'CADENA',
@@ -40,6 +49,14 @@ t_MENQUE   =r'<'
 t_MAYQUE   =r'>'
 t_IGUALIGUAL =r'=='
 t_POW =r'\*\*'
+t_MENIGUAL   =r'<='
+t_MAYIGUAL  =r'>='
+t_MODULO =r'%'
+t_DIFERENTE=r'!='
+t_SOR=r'\|\|'
+t_SAND=r'&&'
+t_SNOT =r'!'
+
 
 def t_DECIMAL(t):
     r'\d+\.\d+'
@@ -149,13 +166,15 @@ def p_instruccion(t) :
     t[0] = t[1]
 
 def p_instruccion_error(t):
-    'instruccion        : error PTCOMA'
+    '''instruccion      : error PTCOMA
+                        | error'''
     errores.append(Excepcion("Sintáctico","Error Sintáctico." + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
     t[0] = ""
 #///////////////////////////////////////IMPRIMIR//////////////////////////////////////////////////
 
 def p_imprimir(t) :
-    'imprimir_instr     : PRINT PARIZQ expresion PARDER PTCOMA'
+    '''imprimir_instr   : PRINT PARIZQ expresion PARDER PTCOMA
+                        | PRINT PARIZQ expresion PARDER'''
     t[0] = Imprimir(t[3], t.lineno(1), find_column(input, t.slice[1]))
 
 #///////////////////////////////////////EXPRESION//////////////////////////////////////////////////
@@ -170,7 +189,10 @@ def p_expresion_binaria(t):
             | expresion MAYQUE expresion
             | expresion IGUALIGUAL expresion
             | expresion POW expresion
-            
+            | expresion MENIGUAL expresion
+            | expresion MAYIGUAL expresion
+            | expresion MODULO expresion
+            | expresion DIFERENTE expresion
     '''
     if t[2] == '+':   t[0] = Aritmetica(OperadorAritmetico.MAS, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '-': t[0] = Aritmetica(OperadorAritmetico.MENOS, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
@@ -180,6 +202,11 @@ def p_expresion_binaria(t):
     elif t[2] == '>': t[0] = Relacional(OperadorRelacional.MAYORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '==':   t[0] = Relacional(OperadorRelacional.IGUALIGUAL, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '**':   t[0] = Aritmetica(OperadorAritmetico.POT, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '<=': t[0] = Relacional(OperadorRelacional.MENORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '>=': t[0] = Relacional(OperadorRelacional.MAYORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '%': t[0] = Aritmetica(OperadorAritmetico.MOD, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '!=': t[0] = Relacional(OperadorRelacional.DIFERENTE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+
 
 
 def p_expresion_unaria(t):
@@ -213,13 +240,15 @@ def p_expresion_id(t):
 #////////////////////////////////DEFINIR VARIABLE ////////////////////////
 
 def p_instruccion_definicion(t) :
-    'definicion_instr   : VAR ID PTCOMA'
+    '''definicion_instr   : VAR ID PTCOMA
+                          | VAR ID '''
     t[0] =Definicion(str(t[2]), t.lineno(1), find_column(input, t.slice[1]))
 
 #////////////////////////////////ASIGNAR VARIABLE ////////////////////////
 
 def p_asignacion_instr(t) :
-    'asignacion_instr   : ID IGUAL expresion PTCOMA'
+    '''asignacion_instr   : ID IGUAL expresion PTCOMA
+                           | ID IGUAL expresion '''
     t[0] =Asignacion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
 
 
