@@ -29,7 +29,14 @@ class Simbolo:
     def setValor(self, valor):
         self.valor = valor
 
-
+class nada:
+    
+    def __init__(self ):
+        self.id = None
+        self.tipo = None
+        self.fila = None
+        self.columna = None
+        self.valor = None
 class TablaSimbolos:
 
     def __init__(self, anterior = None):
@@ -39,28 +46,27 @@ class TablaSimbolos:
 
     def setTabla(self, simbolo):      # Agregar una variable
         if simbolo.id in self.tabla :
-            return Excepcion("Semantico", "Variable " + simbolo.id + " ya existe", simbolo.fila, simbolo.columna)
+            return ("Semantico"+ "- Variable " + simbolo.id + " ya existe ["+ str(simbolo.fila)+" ,"+ str(simbolo.columna)+"]")
         else:
             self.tabla[simbolo.id] = simbolo
-            return None
+            return "VARIABLE GUARDADA"
 
-    def getTabla(self, id):            # obtener una variable
+    def getTabla(self, id,fila,columna):            # obtener una variable
         tablaActual = self
         while tablaActual != None:
             if id in self.tabla :
-                return self.tabla[id]
+                return self.tabla[id].getValor()
             else:
                 tablaActual = tablaActual.anterior
-        return None
+        return  ("Semantico"+ "- Variable " + id + " no existe ["+ str(fila)+" ,"+ str(columna)+"]")
 
     def actualizarTabla(self, simbolo):
         tablaActual = self
-        while tablaActual != None:
+        while tablaActual != None: 
             if simbolo.id in self.tabla :
                 self.tabla[simbolo.id].setValor(simbolo.getValor())
-                self.tabla[simbolo.id].setTipo(simbolo.getTipo())
                 return "Variable Actualizada"
             else:
                 tablaActual = tablaActual.anterior
-        return None
+        return ("Semantico"+ "- Variable " + simbolo.id + " no existe ["+ str(simbolo.fila)+" ,"+ str(simbolo.columna)+"]")
         

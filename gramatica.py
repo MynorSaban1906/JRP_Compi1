@@ -1,4 +1,5 @@
 from Excepcion import Excepcion
+
 errores = []
 reservadas = {
 
@@ -11,9 +12,14 @@ tokens  = [
     'PARIZQ',
     'PARDER',
     'MAS',
+    'IGUAL',
     'MENOS',
     'POR',
+    'POW',
     'DIVIDIDO',
+    'MENQUE',
+    'MAYQUE',
+    'IGUALIGUAL',
     'DECIMAL',
     'ENTERO',
     'CADENA',
@@ -29,6 +35,11 @@ t_MAS           = r'\+'
 t_MENOS           = r'-'
 t_POR       = r'\*'
 t_DIVIDIDO  = r'/'
+t_IGUAL     = r'='
+t_MENQUE   =r'<'
+t_MAYQUE   =r'>'
+t_IGUALIGUAL =r'=='
+t_POW =r'\*\*'
 
 def t_DECIMAL(t):
     r'\d+\.\d+'
@@ -68,6 +79,10 @@ def t_COMENTARIO_SIMPLE(t):
     r'\#.*\n'
     t.lexer.lineno += 1
 
+# Comentario de multiples lineas #* hola comentario multilinea.. *#
+def t_COMENTARIO_MULTILINEA(t):
+    r'\#\*(.|\n)*?\*\#'
+    t.lexer.lineno += t.value.count('\n')
 # Caracteres ignorados
 t_ignore = " \t"
 
@@ -92,12 +107,15 @@ lexer = lex.lex()
 
 #Precedencia   solo estan las basicas
 precedence = (
-    ('left', 'MAS', 'MENOS'),
+    ('left', 'MENQUE', 'MAYQUE','IGUALIGUAL'),
+    ('left', 'MAS', 'MENOS','POW'),
     ('left', 'POR', 'DIVIDIDO'),
-    ('right', 'UMENOS')
+    ('right','UMENOS'),
+    
+
 )
 #Abstract
-from Instruccion import Instruccion,Imprimir,Definicion
+from Instruccion import Instruccion,Imprimir,Definicion,Asignacion
 from expresiones import *
 from Tipo import OperadorLogico,OperadorAritmetico,OperadorRelacional,TIPO
 
@@ -125,6 +143,8 @@ def p_instrucciones_instruccion(t) :
 def p_instruccion(t) :
     '''instruccion      : imprimir_instr
                         | definicion_instr
+                        | asignacion_instr
+                     
     '''
     t[0] = t[1]
 
@@ -146,12 +166,29 @@ def p_expresion_binaria(t):
             | expresion MENOS expresion
             | expresion POR expresion
             | expresion DIVIDIDO expresion
+            | expresion MENQUE expresion
+            | expresion MAYQUE expresion
+            | expresion IGUALIGUAL expresion
+            | expresion POW expresion
             
     '''
     if t[2] == '+':   t[0] = Aritmetica(OperadorAritmetico.MAS, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '-': t[0] = Aritmetica(OperadorAritmetico.MENOS, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '*':   t[0] = Aritmetica(OperadorAritmetico.POR, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
-    elif t[2] == '/': t[0] = Aritmetica(OperadorAritmetico.DIV, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '/':   t[0] = Aritmetica(OperadorAritmetico.DIV, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '<': t[0] = Relacional(OperadorRelacional.MENORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '>': t[0] = Relacional(OperadorRelacional.MAYORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '==':   t[0] = Relacional(OperadorRelacional.IGUALIGUAL, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '**':   t[0] = Aritmetica(OperadorAritmetico.POT, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+
+
+def p_expresion_unaria(t):
+    'expresion : MENOS expresion %prec UMENOS'
+    if t[1] == '-':   t[0] = Aritmetica(OperadorAritmetico.UMENOS, t[2], None, t.lineno(2), find_column(input, t.slice[1]))
+def p_expresion_agrupacion(t):
+    'expresion : PARIZQ expresion PARDER'
+    t[0]=t[2]
+         
 
 def p_expresion_entero(t):
     'expresion : ENTERO'
@@ -169,15 +206,22 @@ def p_primitivo_cadena(t):
     'expresion : CHAR'
     t[0] = Primitivos(TIPO.CHARACTER,str(t[1]).replace('\\n', '\n'), t.lineno(1), find_column(input, t.slice[1]))
 
-def p_expresion_unaria(t):
-    'expresion : MENOS expresion %prec UMENOS'
-    t[0] = Primitivos(OperadorAritmetico.UMENOS,t[2], t.lineno(1), find_column(input, t.slice[1]))
 
+def p_expresion_id(t):
+    'expresion : ID'
+    t[0] = ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[1]))
 #////////////////////////////////DEFINIR VARIABLE ////////////////////////
 
 def p_instruccion_definicion(t) :
     'definicion_instr   : VAR ID PTCOMA'
     t[0] =Definicion(str(t[2]), t.lineno(1), find_column(input, t.slice[1]))
+
+#////////////////////////////////ASIGNAR VARIABLE ////////////////////////
+
+def p_asignacion_instr(t) :
+    'asignacion_instr   : ID IGUAL expresion PTCOMA'
+    t[0] =Asignacion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
 
 import ply.yacc as yacc
 parser = yacc.yacc()
@@ -197,3 +241,52 @@ def parse(inp) :
     input = inp
     return parser.parse(inp)
 
+#INTERFAZ
+
+from Arbol import Arbol
+from ts import TablaSimbolos
+from Instruccion import NameVariable as variablesG
+f = open("./entrada.txt", "r")
+entrada = f.read()
+
+
+instrucciones = parse(entrada) #ARBOL AST
+ast = Arbol(instrucciones)
+TSGlobal = TablaSimbolos()
+ast.setTSglobal(TSGlobal)
+for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
+    ast.getExcepciones().append(error)
+    ast.updateConsola(error.toString())
+
+for instruccion in ast.getInstrucciones():      # REALIZAR LAS ACCIONES
+    value = instruccion.interpretar(ast,TSGlobal)
+    if isinstance(value, Excepcion) :
+        ast.getExcepciones().append(value)
+        ast.updateConsola(value.toString())
+
+print(ast.getConsola())
+
+
+
+
+
+
+
+'''
+def analizador(entrada):
+    variablesG.clear()
+    instrucciones = parse(entrada) #ARBOL AST
+    ast = Arbol(instrucciones)
+    TSGlobal = TablaSimbolos()
+    ast.setTSglobal(TSGlobal)
+    for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
+        ast.getExcepciones().append(error)
+        ast.updateConsola(error.toString())
+
+    for instruccion in ast.getInstrucciones():      # REALIZAR LAS ACCIONES
+        value = instruccion.interpretar(ast,TSGlobal)
+        if isinstance(value, Excepcion) :
+            ast.getExcepciones().append(value)
+            ast.updateConsola(value.toString())
+
+    return ast.getConsola()'''

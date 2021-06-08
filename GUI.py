@@ -4,6 +4,7 @@ from tkinter import scrolledtext    # textarea
 from tkinter import messagebox      # message box
 from tkinter import filedialog as fd # filechooser
 from tkinter import messagebox as mb
+from gramatica import analizador
 
 
 class GUI:
@@ -33,7 +34,7 @@ class GUI:
         self.file_item.add_command(label='Guardar como', command=self.guardarcomo)
  
         self.herramienta_item = Menu(self.menu,tearoff=0)    # SUB MENU HERRAMIENTAS
-        self.herramienta_item.add_command(label='Interpretar')
+        self.herramienta_item.add_command(label='Interpretar',command=self.Analizar)
         self.herramienta_item.add_command(label='Debugger')
         
         self.report_item = Menu(self.menu,tearoff=0)    # SUB MENU REPORTES
@@ -60,13 +61,14 @@ class GUI:
         self.window.mainloop()
 
 
-    def Analyze(self):
-        pass
-
-    def anaCSS(self):
-        pass
+    def Analizar(self):
+        self.txtEntrada.delete(0, 'end')
         
-    
+        entrada= self.txtEntrada.get("1.0",END) # FILA 1 COLUMNA 0
+        scanner= analizador(entrada)
+        self.txtConsola.insert("1.0",scanner)
+
+
     # Dispara el Filechooser
     def abrirFile(self):
         self.nameFile=fd.askopenfilename(title = "Seleccione archivo",filetypes = (("jpr files","*.jpr"),("All Files","*.*")))
