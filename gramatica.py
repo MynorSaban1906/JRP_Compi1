@@ -5,12 +5,24 @@ reservadas = {
 
     'print' : 'PRINT',
     'var' : 'VAR',
+    'null':'NULO',
+    
+
+    'if'        : 'RIF',
+    'else'      : 'RELSE',
+    'else if'   : 'RELSEIF',
+    'while'     : 'RWHILE',
+    'true'      : 'RTRUE',
+    'false'     : 'RFALSE',
+    'break'     : 'RBREAK',
 }
 
 tokens  = [
     'PTCOMA',
     'PARIZQ',
     'PARDER',
+    "LLAIZQ",
+    "LLADER",
     'MAS',
     'IGUAL',
     'MENOS',
@@ -21,14 +33,12 @@ tokens  = [
     'MAYQUE',
     'MODULO',
     'MENIGUAL',
-    'MAYIGUAL'
+    'MAYIGUAL',
     'IGUALIGUAL',
     'DIFERENTE',
-
-
     'SNOT',
     'SAND',
-    'SOR'
+    'SOR',
     'DECIMAL',
     'ENTERO',
     'CADENA',
@@ -40,6 +50,8 @@ tokens  = [
 t_PTCOMA     = r';'
 t_PARIZQ          = r'\('
 t_PARDER        = r'\)'
+t_LLAIZQ          = r'['
+t_LAADER        = r']'
 t_MAS           = r'\+'
 t_MENOS           = r'-'
 t_POR       = r'\*'
@@ -124,6 +136,9 @@ lexer = lex.lex()
 
 #Precedencia   solo estan las basicas
 precedence = (
+    ('left','OR'),
+    ('left','AND'),
+    ('right','UNOT'),
     ('left', 'MENQUE', 'MAYQUE','IGUALIGUAL'),
     ('left', 'MAS', 'MENOS','POW'),
     ('left', 'POR', 'DIVIDIDO'),
@@ -158,23 +173,30 @@ def p_instrucciones_instruccion(t) :
 #///////////////////////////////////////INSTRUCCION//////////////////////////////////////////////////
 
 def p_instruccion(t) :
-    '''instruccion      : imprimir_instr
-                        | definicion_instr
-                        | asignacion_instr
+    '''instruccion      :   imprimir_instr final   
+                        |   definicion_instr final
+                        |   asignacion_instr final
+                        |   if_instr
                      
     '''
     t[0] = t[1]
 
+
+def p_finins(t) :
+    '''final      : PTCOMA
+                    | '''
+    t[0] = None
+
+
+
 def p_instruccion_error(t):
-    '''instruccion      : error PTCOMA
-                        | error'''
-    errores.append(Excepcion("Sintáctico","Error Sintáctico." + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
+    '''instruccion      : error final'''
+    errores.append(Excepcion("Sintáctico","Error Sintáctico. " + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
     t[0] = ""
 #///////////////////////////////////////IMPRIMIR//////////////////////////////////////////////////
 
 def p_imprimir(t) :
-    '''imprimir_instr   : PRINT PARIZQ expresion PARDER PTCOMA
-                        | PRINT PARIZQ expresion PARDER'''
+    '''imprimir_instr   : PRINT PARIZQ expresion PARDER '''
     t[0] = Imprimir(t[3], t.lineno(1), find_column(input, t.slice[1]))
 
 #///////////////////////////////////////EXPRESION//////////////////////////////////////////////////
@@ -193,6 +215,8 @@ def p_expresion_binaria(t):
             | expresion MAYIGUAL expresion
             | expresion MODULO expresion
             | expresion DIFERENTE expresion
+            | expresion AND expresion
+            | expresion OR expresion
     '''
     if t[2] == '+':   t[0] = Aritmetica(OperadorAritmetico.MAS, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '-': t[0] = Aritmetica(OperadorAritmetico.MENOS, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
@@ -206,12 +230,22 @@ def p_expresion_binaria(t):
     elif t[2] == '>=': t[0] = Relacional(OperadorRelacional.MAYORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '%': t[0] = Aritmetica(OperadorAritmetico.MOD, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '!=': t[0] = Relacional(OperadorRelacional.DIFERENTE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '&&': t[0] = Logica(OperadorLogico.AND, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '||': t[0] = Logica(OperadorLogico.OR, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
 
 
 
 def p_expresion_unaria(t):
-    'expresion : MENOS expresion %prec UMENOS'
-    if t[1] == '-':   t[0] = Aritmetica(OperadorAritmetico.UMENOS, t[2], None, t.lineno(2), find_column(input, t.slice[1]))
+    '''
+    expresion : MENOS expresion %prec UMENOS 
+            | NOT expresion %prec UNOT 
+    '''
+    if t[1] == '-':
+        t[0] = Aritmetica(OperadorAritmetico.UMENOS, t[2],None, t.lineno(1), find_column(input, t.slice[1]))
+    elif t[1] == '!':
+        t[0] = Logica(OperadorLogico.NOT, t[2],None, t.lineno(1), find_column(input, t.slice[1]))
+
+
 def p_expresion_agrupacion(t):
     'expresion : PARIZQ expresion PARDER'
     t[0]=t[2]
@@ -229,10 +263,20 @@ def p_primitivo_cadena(t):
     'expresion : CADENA'
     t[0] = Primitivos(TIPO.CADENA,str(t[1]).replace('\\n', '\n'), t.lineno(1), find_column(input, t.slice[1]))
 
-def p_primitivo_cadena(t):
+def p_primitivo_char(t):
     'expresion : CHAR'
     t[0] = Primitivos(TIPO.CHARACTER,str(t[1]).replace('\\n', '\n'), t.lineno(1), find_column(input, t.slice[1]))
 
+def p_primitivo_nulo(t):
+    'expresion : NULO'
+    t[0] = Primitivos(TIPO.NULO,None, t.lineno(1), find_column(input, t.slice[1]))
+def p_primitivo_true(t):
+    '''expresion : RTRUE'''
+    t[0] = Primitivos(TIPO.BOOLEANO, True, t.lineno(1), find_column(input, t.slice[1]))
+
+def p_primitivo_false(t):
+    '''expresion : RFALSE'''
+    t[0] = Primitivos(TIPO.BOOLEANO, False, t.lineno(1), find_column(input, t.slice[1]))
 
 def p_expresion_id(t):
     'expresion : ID'
@@ -240,16 +284,28 @@ def p_expresion_id(t):
 #////////////////////////////////DEFINIR VARIABLE ////////////////////////
 
 def p_instruccion_definicion(t) :
-    '''definicion_instr   : VAR ID PTCOMA
-                          | VAR ID '''
+    '''definicion_instr   : VAR ID '''
     t[0] =Definicion(str(t[2]), t.lineno(1), find_column(input, t.slice[1]))
 
 #////////////////////////////////ASIGNAR VARIABLE ////////////////////////
 
 def p_asignacion_instr(t) :
-    '''asignacion_instr   : ID IGUAL expresion PTCOMA
-                           | ID IGUAL expresion '''
+    '''asignacion_instr   : ID IGUAL expresion '''
     t[0] =Asignacion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
+# /////////////////////////////// IF //////////////////////////
+
+def p_if1(t) :
+    'if_instr     : RIF PARIZQ expresion PARDER LLAIZQ instrucciones LLADER'
+    t[0] = If(t[3], t[6], None, None, t.lineno(1), find_column(input, t.slice[1]))
+
+def p_if2(t) :
+    'if_instr     : RIF PARIZQ expresion PARDER LLAIQZ instrucciones LLADER RELSE LLAIZQ instrucciones LLADER'
+    t[0] = If(t[3], t[6], t[10], None, t.lineno(1), find_column(input, t.slice[1]))
+
+def p_if3(t) :
+    'if_instr     : RIF PARIZQ expresion PARDER LLAIZQ instrucciones LLADER RELSE if_instr'
+    t[0] = If(t[3], t[6], None, t[9], t.lineno(1), find_column(input, t.slice[1]))
 
 
 import ply.yacc as yacc
@@ -311,11 +367,21 @@ def analizador(entrada):
     for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
         ast.getExcepciones().append(error)
         ast.updateConsola(error.toString())
-
     for instruccion in ast.getInstrucciones():      # REALIZAR LAS ACCIONES
         value = instruccion.interpretar(ast,TSGlobal)
         if isinstance(value, Excepcion) :
             ast.getExcepciones().append(value)
             ast.updateConsola(value.toString())
+    return ast.getConsola()
+    
 
-    return ast.getConsola()'''
+
+
+    
+    
+    
+    
+    
+    '''
+
+    

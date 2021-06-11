@@ -1,4 +1,4 @@
-from Tipo import TIPO,OperadorAritmetico,OperadorRelacional
+from Tipo import TIPO,OperadorAritmetico,OperadorRelacional,OperadorLogico
 from Excepcion import Excepcion
 from Instruccion import Instruccion,NameVariable
 
@@ -41,18 +41,24 @@ class ExpresionIdentificador(Instruccion) :
         Esta clase representa un identificador.
     '''
 
-    def __init__(self, valor, fila, columna):
+    def __init__(self, identificador, fila, columna):
         self.tipo=None
-        self.id = valor
+        self.identificador = identificador
         self.fila = fila
         self.columna = columna
 
     def interpretar(self, tree, table):
-        response=NameVariable.getTabla(id,self.fila,self.columna)
-        return response
+        simbolo = table.getTabla(self.identificador,self.fila,self.columna)
 
-            
+        if simbolo == None:
+            return Excepcion("Semantico", "Variable " + self.identificador + " no encontrada.", self.fila, self.columna)
 
+        self.tipo = simbolo.getTipo()
+        
+        return simbolo.getValor()
+
+
+        
 class ExpresionCadena :
     '''
         Esta clase representa una Expresión de tipo cadena.
@@ -478,4 +484,45 @@ class Relacional(Instruccion):
         elif tipo == TIPO.BOOLEANO:
             return bool(val)
         return str(val)
-     
+
+
+class Logica(Instruccion):
+    def __init__(self, operador, OperacionIzq, OperacionDer, fila, columna):
+        self.operador = operador
+        self.OperacionIzq = OperacionIzq
+        self.OperacionDer = OperacionDer
+        self.fila = fila
+        self.columna = columna
+        self.tipo = TIPO.BOOLEANO
+
+    
+    def interpretar(self, tree, table):
+        izq = self.OperacionIzq.interpretar(tree, table)
+        if isinstance(izq, Excepcion): return izq
+        if self.OperacionDer != None:
+            der = self.OperacionDer.interpretar(tree, table)
+            if isinstance(der, Excepcion): return der
+
+        if self.operador == OperadorLogico.AND:
+            if self.OperacionIzq.tipo == TIPO.BOOLEANO and self.OperacionDer.tipo == TIPO.BOOLEANO:
+                return self.obtenerVal(self.OperacionIzq.tipo, izq) and self.obtenerVal(self.OperacionDer.tipo, der)
+            return Excepcion("Semantico", "Tipo Erroneo de operacion para AND &&. ", self.fila, self.columna)
+        elif self.operador == OperadorLogico.OR:
+            if self.OperacionIzq.tipo == TIPO.BOOLEANO and self.OperacionDer.tipo == TIPO.BOOLEANO:
+                return self.obtenerVal(self.OperacionIzq.tipo, izq) or self.obtenerVal(self.OperacionDer.tipo, der)
+            return Excepcion("Semantico", "Tipo Erroneo de operacion para OR ||. ", self.fila, self.columna)
+        elif self.operador == OperadorLogico.NOT:
+            if self.OperacionIzq.tipo == TIPO.BOOLEANO:
+                return not self.obtenerVal(self.OperacionIzq.tipo, izq)
+            return Excepcion("Semantico", "Tipo Erroneo de operacion para NOT !. ", self.fila, self.columna)
+        return Excepcion("Semantico", "Tipo de Operacion no Especificado. ", self.fila, self.columna)
+
+    def obtenerVal(self, tipo, val):
+        if tipo == TIPO.ENTERO:
+            return int(val)
+        elif tipo == TIPO.DECIMAL:
+            return float(val)
+        elif tipo == TIPO.BOOLEANO:
+            return bool(val)
+        return str(val)
+        
