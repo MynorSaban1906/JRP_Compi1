@@ -9,12 +9,12 @@ reservadas = {
     
 
     'if'        : 'RIF',
-    'else'      : 'RELSE',
-    'else if'   : 'RELSEIF',
-    'while'     : 'RWHILE',
+    'else'      : 'RELSE', 
     'true'      : 'RTRUE',
     'false'     : 'RFALSE',
+    'while'     : 'RWHILE',
     'break'     : 'RBREAK',
+    'for '      : 'RFOR'
 }
 
 tokens  = [
@@ -36,9 +36,9 @@ tokens  = [
     'MAYIGUAL',
     'IGUALIGUAL',
     'DIFERENTE',
-    'SNOT',
-    'SAND',
-    'SOR',
+    'NOT',
+    'AND',
+    'OR',
     'DECIMAL',
     'ENTERO',
     'CADENA',
@@ -50,8 +50,8 @@ tokens  = [
 t_PTCOMA     = r';'
 t_PARIZQ          = r'\('
 t_PARDER        = r'\)'
-t_LLAIZQ          = r'['
-t_LAADER        = r']'
+t_LLAIZQ          = r'{'
+t_LLADER        = r'}'
 t_MAS           = r'\+'
 t_MENOS           = r'-'
 t_POR       = r'\*'
@@ -65,9 +65,9 @@ t_MENIGUAL   =r'<='
 t_MAYIGUAL  =r'>='
 t_MODULO =r'%'
 t_DIFERENTE=r'!='
-t_SOR=r'\|\|'
-t_SAND=r'&&'
-t_SNOT =r'!'
+t_OR=r'\|\|'
+t_AND=r'&&'
+t_NOT =r'!'
 
 
 def t_DECIMAL(t):
@@ -147,7 +147,7 @@ precedence = (
 
 )
 #Abstract
-from Instruccion import Instruccion,Imprimir,Definicion,Asignacion
+from Instruccion import Instruccion,Imprimir,Definicion,Asignacion,If,Break,While
 from expresiones import *
 from Tipo import OperadorLogico,OperadorAritmetico,OperadorRelacional,TIPO
 
@@ -177,6 +177,9 @@ def p_instruccion(t) :
                         |   definicion_instr final
                         |   asignacion_instr final
                         |   if_instr
+                        |   break_instr final
+                        |   while_instr
+                        |   for_instr
                      
     '''
     t[0] = t[1]
@@ -300,12 +303,34 @@ def p_if1(t) :
     t[0] = If(t[3], t[6], None, None, t.lineno(1), find_column(input, t.slice[1]))
 
 def p_if2(t) :
-    'if_instr     : RIF PARIZQ expresion PARDER LLAIQZ instrucciones LLADER RELSE LLAIZQ instrucciones LLADER'
+    'if_instr     : RIF PARIZQ expresion PARDER LLAIZQ instrucciones LLADER RELSE LLAIZQ instrucciones LLADER'
     t[0] = If(t[3], t[6], t[10], None, t.lineno(1), find_column(input, t.slice[1]))
 
 def p_if3(t) :
     'if_instr     : RIF PARIZQ expresion PARDER LLAIZQ instrucciones LLADER RELSE if_instr'
     t[0] = If(t[3], t[6], None, t[9], t.lineno(1), find_column(input, t.slice[1]))
+
+#///////////////////////////////////////BREAK//////////////////////////////////////////////////
+
+def p_break(t) :
+    'break_instr     : RBREAK'
+    t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
+
+
+
+#///////////////////////////////////////WHILE//////////////////////////////////////////////////
+
+def p_while(t) :
+    'while_instr     : RWHILE PARIZQ expresion PARDER LLAIZQ instrucciones LLADER'
+    t[0] = While(t[3], t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+
+#///////////////////////////////////  FOR ///////////////////////////
+def p_ciclo_for(t) :
+    'for_instr     : RWHILE PARIZQ expresion PARDER LLAIZQ instrucciones LLADER'
+    t[0] = While(t[3], t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+
 
 
 import ply.yacc as yacc
@@ -330,7 +355,6 @@ def parse(inp) :
 
 from Arbol import Arbol
 from ts import TablaSimbolos
-from Instruccion import NameVariable as variablesG
 f = open("./entrada.txt", "r")
 entrada = f.read()
 

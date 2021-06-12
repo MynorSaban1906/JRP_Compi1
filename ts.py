@@ -29,6 +29,18 @@ class Simbolo:
     def setValor(self, valor):
         self.valor = valor
 
+    def getFila(self):
+        return self.fila
+
+    def setFila(self, fila):
+        self.fila= fila 
+
+    def getColumna(self):
+        return self.columna
+
+    def setColumna(self, columna):
+        self.columna= columna
+
 
 class TablaSimbolos:
 
@@ -46,9 +58,9 @@ class TablaSimbolos:
 
     def getTabla(self, id,fila,columna):            # obtener una variable
         tablaActual = self
-        while tablaActual != None:
-            if id in self.tabla :
-                return self.tabla[id]
+        while tablaActual.tabla != None:
+            if id in tablaActual.tabla :
+                return tablaActual.tabla[id]           # RETORNA SIMBOLO
             else:
                 tablaActual = tablaActual.anterior
         return Excepcion("Semantico", "Variable " + id + " no existe", fila, columna)
@@ -56,12 +68,12 @@ class TablaSimbolos:
     def actualizarTabla(self, simbolo):
         tablaActual = self
         while tablaActual != None: 
-            if simbolo.id in self.tabla :
-                if self.tabla[simbolo.id].getTipo()==simbolo.getTipo() or  self.tabla[simbolo.id].getTipo()==TIPO.NULO or simbolo.getTipo()==TIPO.NULO:
-                    self.tabla[simbolo.id].setValor(simbolo.getValor())
-                    self.tabla[simbolo.id].setTipo(simbolo.getTipo())
+            if simbolo.id in tablaActual.tabla :
+                if tablaActual.tabla[simbolo.id].getTipo()==simbolo.getTipo() or  self.tabla[simbolo.id].getTipo()==TIPO.NULO or simbolo.getTipo()==TIPO.NULO:
+                    tablaActual.tabla[simbolo.id].setValor(simbolo.getValor())
+                    tablaActual.tabla[simbolo.id].setTipo(simbolo.getTipo())
                     return None
-                return Excepcion("Semantico", "Tipo de asignacion diferente en asignar" + simbolo.id , simbolo.fila, simbolo.columna)
+                return Excepcion("Semantico", "Tipo de diferente en la variable " + simbolo.id , simbolo.fila, simbolo.columna)
             else:
                 tablaActual = tablaActual.anterior
         return Excepcion("Semantico", "Variable No encontrada en Asignacion", simbolo.getFila(), simbolo.getColumna())
