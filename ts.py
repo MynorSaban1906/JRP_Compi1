@@ -56,14 +56,14 @@ class TablaSimbolos:
             self.tabla[simbolo.id] = simbolo
             return None
 
-    def getTabla(self, id,fila,columna):            # obtener una variable
+    def getTabla(self, id):            # obtener una variable
         tablaActual = self
-        while tablaActual.tabla != None:
+        while tablaActual != None:
             if id in tablaActual.tabla :
                 return tablaActual.tabla[id]           # RETORNA SIMBOLO
             else:
                 tablaActual = tablaActual.anterior
-        return Excepcion("Semantico", "Variable " + id + " no existe", fila, columna)
+        return None
 
     def actualizarTabla(self, simbolo):
         tablaActual = self

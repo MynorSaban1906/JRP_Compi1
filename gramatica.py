@@ -1,5 +1,5 @@
 from Excepcion import Excepcion
-
+import re
 errores = []
 reservadas = {
 
@@ -14,7 +14,10 @@ reservadas = {
     'false'     : 'RFALSE',
     'while'     : 'RWHILE',
     'break'     : 'RBREAK',
-    'for '      : 'RFOR'
+    'for'       : 'RFOR',
+    'switch'    : 'RSWITCH',
+    'case'      : 'RCASE'
+
 }
 
 tokens  = [
@@ -43,7 +46,13 @@ tokens  = [
     'ENTERO',
     'CADENA',
     'CHAR',
-    'ID'
+    'ID',
+    'AUMENTO',
+    'DECRECI',
+    'DPUNTOS'
+
+
+
 ] + list(reservadas.values())
 
 # Tokens
@@ -68,7 +77,9 @@ t_DIFERENTE=r'!='
 t_OR=r'\|\|'
 t_AND=r'&&'
 t_NOT =r'!'
-
+t_AUMENTO= '\+\+'
+t_DECRECI='--'
+t_DPUNTOS=':'
 
 def t_DECIMAL(t):
     r'\d+\.\d+'
@@ -95,11 +106,11 @@ def t_ENTERO(t):
 
 def t_ID(t):
      r'[a-zA-Z][a-zA-Z_0-9]*'
-     t.type = reservadas.get(t.value.lower(),'ID')
+     t.type = reservadas.get(t.value,'ID')
      return t
 
 def t_CADENA(t):
-    r'(\".*?\")'
+    r'\"(\\"|.)*?\"'
     t.value = t.value[1:-1] # remuevo las comillas
     return t
 
@@ -133,21 +144,26 @@ def find_column(inp, token):
 # Construyendo el analizador léxico
 import ply.lex as lex
 lexer = lex.lex()
+lexer = lex.lex(reflags= re.IGNORECASE)
 
 #Precedencia   solo estan las basicas
 precedence = (
+
     ('left','OR'),
     ('left','AND'),
     ('right','UNOT'),
     ('left', 'MENQUE', 'MAYQUE','IGUALIGUAL'),
-    ('left', 'MAS', 'MENOS','POW'),
+    ('left', 'MAS', 'MENOS'),
     ('left', 'POR', 'DIVIDIDO'),
+    ('left','POW'),
     ('right','UMENOS'),
+    ('left','INCREMENTO','DECREMENTO'),
     
 
 )
 #Abstract
-from Instruccion import Instruccion,Imprimir,Definicion,Asignacion,If,Break,While
+from Instruccion import  For, Inc_Dec,Imprimir,Definicion,Asignacion,If,Break,While
+from Instruccion import Declaracion
 from expresiones import *
 from Tipo import OperadorLogico,OperadorAritmetico,OperadorRelacional,TIPO
 
@@ -179,8 +195,9 @@ def p_instruccion(t) :
                         |   if_instr
                         |   break_instr final
                         |   while_instr
+                        |   inc_dec final
                         |   for_instr
-                     
+                        |   switch_instr
     '''
     t[0] = t[1]
 
@@ -202,7 +219,20 @@ def p_imprimir(t) :
     '''imprimir_instr   : PRINT PARIZQ expresion PARDER '''
     t[0] = Imprimir(t[3], t.lineno(1), find_column(input, t.slice[1]))
 
+
+
+#/////////////////////////////////////// incremento y decrecimiento +++ --  //////////////////////////////////////////////////
+
+def p_incremento_expresion(t):
+    '''expresion : expresion AUMENTO %prec INCREMENTO
+                | expresion DECRECI %prec DECREMENTO'''
+    if t[2]=='++': t[0] = Aritmetica(OperadorAritmetico.AUMENTO, t[1],None, t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2]=='--':t[0] = Aritmetica(OperadorAritmetico.DECREMENTO, t[1],None, t.lineno(2), find_column(input, t.slice[2]))
+
+
+
 #///////////////////////////////////////EXPRESION//////////////////////////////////////////////////
+
 
 def p_expresion_binaria(t):
     '''
@@ -249,6 +279,8 @@ def p_expresion_unaria(t):
         t[0] = Logica(OperadorLogico.NOT, t[2],None, t.lineno(1), find_column(input, t.slice[1]))
 
 
+
+
 def p_expresion_agrupacion(t):
     'expresion : PARIZQ expresion PARDER'
     t[0]=t[2]
@@ -264,7 +296,12 @@ def p_primitivo_decimal(t):
 
 def p_primitivo_cadena(t):
     'expresion : CADENA'
-    t[0] = Primitivos(TIPO.CADENA,str(t[1]).replace('\\n', '\n'), t.lineno(1), find_column(input, t.slice[1]))
+    t[1]=str(t[1]).replace('\\t','\t')
+    t[1]=str(t[1]).replace('\\n','\n')
+    t[1]=str(t[1]).replace('\\\\','\\')
+    t[1]=str(t[1]).replace("\\'","\'")
+    t[1]=str(t[1]).replace('\\"','"')
+    t[0] = Primitivos(TIPO.CADENA,str(t[1]), t.lineno(1), find_column(input, t.slice[1]))
 
 def p_primitivo_char(t):
     'expresion : CHAR'
@@ -281,15 +318,35 @@ def p_primitivo_false(t):
     '''expresion : RFALSE'''
     t[0] = Primitivos(TIPO.BOOLEANO, False, t.lineno(1), find_column(input, t.slice[1]))
 
+
+
 def p_expresion_id(t):
     'expresion : ID'
     t[0] = ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[1]))
+
+#///////////////////////////////////////FOR//////////////////////////////////////////////////
+
+
+
+
+
 #////////////////////////////////DEFINIR VARIABLE ////////////////////////
 
-def p_instruccion_definicion(t) :
-    '''definicion_instr   : VAR ID '''
-    t[0] =Definicion(str(t[2]), t.lineno(1), find_column(input, t.slice[1]))
+def p_instrucion_definicion(t):
+    '''definicion_instr     : definicion_instr1
+                            | definicion_instr2'''
+    t[0]=t[1]
 
+def p_instruccion_definicion1(t):
+    'definicion_instr1       : VAR ID IGUAL expresion'
+    t[0]=   Declaracion(t[1], t[2], t.lineno(2), find_column(input, t.slice[2]), t[4])
+
+def p_instruccion_definicion(t) :
+    '''definicion_instr2     : VAR ID
+        '''
+    t[0] =Definicion(t[2], t.lineno(1), find_column(input, t.slice[1]))
+
+ 
 #////////////////////////////////ASIGNAR VARIABLE ////////////////////////
 
 def p_asignacion_instr(t) :
@@ -325,12 +382,42 @@ def p_while(t) :
     t[0] = While(t[3], t[6], t.lineno(1), find_column(input, t.slice[1]))
 
 
-#///////////////////////////////////  FOR ///////////////////////////
-def p_ciclo_for(t) :
-    'for_instr     : RWHILE PARIZQ expresion PARDER LLAIZQ instrucciones LLADER'
-    t[0] = While(t[3], t[6], t.lineno(1), find_column(input, t.slice[1]))
 
 
+
+def p_cicloFor(t) :
+    'for_instr     : RFOR PARIZQ definicion_instr PTCOMA expresion PTCOMA inc_dec PARDER LLAIZQ  instrucciones LLADER'
+    t[0] = For(t[3], t[5],t[7],t[10], t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_incremento_instruccion(t):
+    '''inc_dec : ID AUMENTO %prec INCREMENTO
+                | ID DECRECI %prec DECREMENTO'''
+    if t[2]=='++': t[0] = Inc_Dec(ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.AUMENTO, t.lineno(1), find_column(input, t.slice[2]))
+    elif t[2]=='--': t[0] = Inc_Dec(ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.DECREMENTO, t.lineno(1), find_column(input, t.slice[2]))
+
+
+def p_switch(t) :
+    'switch_instr     : RSWITCH PARIZQ expresion PARDER LLAIZQ cases_lista LLADER'
+    t[0] = For(t[3], t[6],t[6],t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_lista_casos(t) :
+    'cases_lista    : cases_lista case'
+    if t[2] != "":
+        t[1].append(t[2])
+    t[0] = t[1]
+    
+def p_lista_casos_caso(t) :
+    'cases_lista    : case'
+    if t[1] == "":
+        t[0] = []
+    else:    
+        t[0] = [t[1]]
+
+def p_case_instruccion(t) :
+    '''case     :   RCASE expresion DPUNTOS instrucciones RBREAK
+    '''
+    t[0] = t[1]
 
 
 import ply.yacc as yacc

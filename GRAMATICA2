@@ -1,0 +1,21 @@
+
+def p_while(t) :
+    'for_instr     : RFOR PARIZQ definicion_instr PTCOMA expresion PTCOMA AUMENTO PARDER LLAIZQ instrucciones LLADER'
+    t[0] = While(t[3], t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+
+
+def p_simboloif(t):
+    '''forsimbolo   : AUMENTO
+                    | DECRECI'''
+    t[0]=t[1]
+
+
+
+def p_cicloFor(t) :
+    'for_instr     : RFOR PARIZQ definicionvar PTCOMA expresion PTCOMA forsimbolo PARDER LLAIZQ  instrucciones LLADER'
+    t[0] = For(t[3], t[5],t[7],t[10], t.lineno(1), find_column(input, t.slice[1]))
+def p_instrucion_declaracion(t):
+    '''declaracionvar     : definicion_instr1
+                            | asignacion_instr'''
+    t[0]=t[1]
