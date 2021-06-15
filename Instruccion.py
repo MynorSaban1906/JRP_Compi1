@@ -42,7 +42,7 @@ class Definicion(Instruccion) :
         self.columna = columna
 
     def interpretar(self, tree, table):
-        simbolo = Simbolo(self.identificador,self.tipo,self.fila,self.columna,None)
+        simbolo = Simbolo(self.identificador.lower(),self.tipo,self.fila,self.columna,None)
         result = table.setTabla(simbolo)
         
         if isinstance(result,Excepcion): return result
@@ -62,7 +62,7 @@ class Asignacion(Instruccion) :
         value = self.expresion.interpretar(tree, table) # Valor a asignar a la variable
         if isinstance(value, Excepcion): return value
 
-        simbolo = Simbolo(self.identificador, self.expresion.tipo, self.fila, self.columna, value)
+        simbolo = Simbolo(self.identificador.lower(), self.expresion.tipo, self.fila, self.columna, value)
     
         result = table.actualizarTabla(simbolo)
 
@@ -136,6 +136,7 @@ class While(Instruccion):
                             tree.getExcepciones().append(result)
                             tree.updateConsola(result.toString())
                         if isinstance(result, Break): return None
+
                 else:
                     break
             else:
@@ -162,12 +163,12 @@ class Declaracion(Instruccion):
         value = self.expresion.interpretar(tree, table) # Valor a asignar a la variable
         if isinstance(value, Excepcion): return value
 
-        simbolo = Simbolo(self.identificador, self.expresion.tipo , self.fila, self.columna, value)
+        simbolo = Simbolo(self.identificador.lower(), self.expresion.tipo , self.fila, self.columna, value)
 
         result = table.setTabla(simbolo)
 
         if isinstance(result, Excepcion): return result
-        
+        self.tipo=simbolo.getTipo()  # AUN ESTA EN PRUEBA
         return None
 
 
@@ -182,24 +183,27 @@ class For(Instruccion):
         self.columna = columna
 
     def interpretar(self, tree, table):
-        declaracion = self.inicial.interpretar(tree, table)
+        nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
+        declaracion = self.inicial.interpretar(tree, nuevaTabla)
         if isinstance(declaracion, Excepcion): return declaracion # retorna error si no es correcta
 
         while True:
             #verifica la expresiones para ingresar al for 
-            expresion = self.condicion.interpretar(tree, table)
+            expresion = self.condicion.interpretar(tree, nuevaTabla)
             if isinstance(expresion, Excepcion): return expresion
             if self.condicion.tipo== TIPO.BOOLEANO:
                 if bool(expresion) == True:   # VERIFICA SI ES VERDADERA LA CONDICION
-                    nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
+                    nuevaTabla2 = TablaSimbolos(nuevaTabla)       #NUEVO ENTORNO
                     for instruccion in self.instrucciones:
-                        result = instruccion.interpretar(tree, nuevaTabla) #EJECUTA INSTRUCCION ADENTRO DEL IF
+                        result = instruccion.interpretar(tree, nuevaTabla2) #EJECUTA INSTRUCCION ADENTRO DEL IF
                         if isinstance(result, Excepcion) :
                             tree.getExcepciones().append(result)
                             tree.updateConsola(result.toString())
+
                         if isinstance(result, Break): return None
+
                     #aumenta la variable para la siguiente iteracion
-                    paso= self.paso.interpretar(tree,nuevaTabla)
+                    paso= self.paso.interpretar(tree,nuevaTabla2)
                     if isinstance(paso,Excepcion): return paso
 
                 else:
@@ -232,12 +236,11 @@ class Inc_Dec(Instruccion):
             return Excepcion("Semantico", "error en caracter de incremento o decremento ", self.fila, self.columna)
             
         result=table.actualizarTabla(simbolo)
-        self.tipo=simbolo.getTipo()
+        
         if isinstance(result,Excepcion): return result
 
 
         return simbolo.getValor()
-
 
 class Case(Instruccion):
     def __init__(self, expresion,recibido, fila, columna):
@@ -264,3 +267,125 @@ class Case(Instruccion):
                     break
             else:
                 return Excepcion("Semantico", "Tipo de dato no booleano en while.", self.fila, self.columna)
+
+
+
+class Switch(Instruccion):
+    def __init__(self, expresion,listaInstrucciones,default, fila, columna):
+        self.expresion = expresion # valor que se encuentra dentro del switch
+        self.listaInstrucciones=listaInstrucciones
+        self.default=default
+        self.fila = fila
+        self.columna = columna
+
+    def interpretar(self, tree, table):
+        nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
+        expresion = self.expresion.interpretar(tree, nuevaTabla)
+        if isinstance(expresion, Excepcion): return expresion # retorna error si no es correcta
+        bandera= None
+        while True:
+            if self.listaInstrucciones!=None:
+                for instruccion in self.listaInstrucciones:
+                    #obtiene la expresion que tiene el case<EXPRESION>
+                    expresioncase = instruccion.interpretar(tree, nuevaTabla) 
+
+                    # compara la expresion switch con la del case
+                    if str(expresioncase)==str(expresion): 
+                        tablaCase = TablaSimbolos(table)       #NUEVO ENTORNO
+                        for instcase in instruccion.getInstrucciones():
+                            #obtiene las instrucciones dentro del case y las ejecuta
+                            InstruccionesCase = instcase.interpretar(tree, tablaCase ) 
+                            if isinstance(InstruccionesCase, Excepcion) :
+                                tree.getExcepciones().append(InstruccionesCase)
+                                tree.updateConsola(InstruccionesCase.toString())
+                            if isinstance(InstruccionesCase, Break): 
+                                bandera=True 
+                                return None
+                            bandera=False # SI EL CASE NO TIENE BREAK SIGUE EVALUANDO LOS DEMAS CASOS
+                    elif bandera==False and self.default==None:
+                        tablaCase1 = TablaSimbolos(table)
+                        for instcase in instruccion.getInstrucciones():
+                            #obtiene las instrucciones dentro del case y las ejecuta
+                            InstruccionesCase = instcase.interpretar(tree, tablaCase1) 
+                            if isinstance(InstruccionesCase, Excepcion) :
+                                tree.getExcepciones().append(InstruccionesCase)
+                                tree.updateConsola(InstruccionesCase.toString())
+                            if isinstance(InstruccionesCase, Break): return None
+                    elif bandera==False and self.default!=None:
+                        tablaCase = TablaSimbolos(table)       #NUEVO ENTORNO
+                        for instrucciones in self.default:
+                            #obtiene las instrucciones dentro del case y las ejecuta
+                            Instrucciones = instrucciones.interpretar(tree, tablaCase ) 
+                            if isinstance(Instrucciones, Excepcion) :
+                                tree.getExcepciones().append(Instrucciones)
+                                tree.updateConsola(Instrucciones.toString())
+                            if isinstance(Instrucciones, Break):  return None
+                        else:
+                            break
+                
+                if self.default!=None:
+                    tablaCase = TablaSimbolos(table)       #NUEVO ENTORNO
+                    for instrucciones in self.default:
+                        #obtiene las instrucciones dentro del case y las ejecuta
+                        Instrucciones = instrucciones.interpretar(tree, tablaCase ) 
+                        if isinstance(Instrucciones, Excepcion) :
+                            tree.getExcepciones().append(Instrucciones)
+                            tree.updateConsola(Instrucciones.toString())
+                        if isinstance(Instrucciones, Break):  return None
+                    else:
+                        break
+                else:
+                    break
+            elif self.default!=None:
+
+                tablaCase = TablaSimbolos(table)       #NUEVO ENTORNO
+                for instrucciones in self.default:
+                    #obtiene las instrucciones dentro del case y las ejecuta
+                    Instrucciones = instrucciones.interpretar(tree, tablaCase ) 
+                    if isinstance(Instrucciones, Excepcion) :
+                        tree.getExcepciones().append(Instrucciones)
+                        tree.updateConsola(Instrucciones.toString())
+                    if isinstance(Instrucciones, Break):  return None
+                else:
+                    break
+
+            
+                        
+            
+class Case(Instruccion):
+    def __init__(self, expresion,instrucciones, fila, columna):
+        self.expresion = expresion
+        self.instrucciones = instrucciones
+        self.fila = fila
+        self.columna = columna
+
+    def interpretar(self, tree, table):
+        retorno = self.expresion.interpretar(tree, table)  # RETORNA CUALQUIER VALOR
+        if isinstance(retorno, Excepcion) :
+            return retorno
+
+        return retorno
+        
+    def getExpresion(self):
+        return self.expresion
+
+    def setExpresion(self, expresion):
+        self.expresion = expresion
+
+    def getInstrucciones(self):
+        return self.instrucciones
+
+    def setInstrucciones(self, instrucciones):
+        self.instrucciones = instrucciones
+
+    def getFila(self):
+        return self.fila
+
+    def setFila(self, fila):
+        self.fila= fila 
+
+    def getColumna(self):
+        return self.columna
+
+    def setColumna(self, columna):
+        self.columna= columna

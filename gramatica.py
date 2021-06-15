@@ -1,6 +1,9 @@
-from Excepcion import Excepcion
 import re
+
+from Excepcion import Excepcion
+
 errores = []
+
 reservadas = {
 
     'print' : 'PRINT',
@@ -16,7 +19,10 @@ reservadas = {
     'break'     : 'RBREAK',
     'for'       : 'RFOR',
     'switch'    : 'RSWITCH',
-    'case'      : 'RCASE'
+    'case'      : 'RCASE',
+    'default'   : 'DEFAULT',
+    'main'      : 'RMAIN',
+    'func'      : 'RFUNC',
 
 }
 
@@ -73,7 +79,7 @@ t_POW =r'\*\*'
 t_MENIGUAL   =r'<='
 t_MAYIGUAL  =r'>='
 t_MODULO =r'%'
-t_DIFERENTE=r'!='
+t_DIFERENTE=r'=!'
 t_OR=r'\|\|'
 t_AND=r'&&'
 t_NOT =r'!'
@@ -91,7 +97,7 @@ def t_DECIMAL(t):
     return t
 
 def t_CHAR(t):
-    r'(\'[a-zA-Z]+\')'
+    r'(\'([a-zA-Z]|\\\'|\\"|\\t|\\n|\\\\|.)\')'
     t.value = t.value[1:-1] # remuevo las comillas
     return t
 
@@ -103,12 +109,6 @@ def t_ENTERO(t):
         print("Integer value too large %d", t.value)
         t.value = 0
     return t
-
-def t_ID(t):
-     r'[a-zA-Z][a-zA-Z_0-9]*'
-     t.type = reservadas.get(t.value,'ID')
-     return t
-
 def t_CADENA(t):
     r'\"(\\"|.)*?\"'
     t.value = t.value[1:-1] # remuevo las comillas
@@ -134,6 +134,12 @@ def t_error(t):
     errores.append(Excepcion("Lexico","Error léxico." + t.value[0] , t.lexer.lineno, find_column(input, t)))
     t.lexer.skip(1)
 
+def t_ID(t):
+     r'[a-zA-Z_][a-zA-Z_0-9]*'
+     t.type = reservadas.get(t.value.lower(),'ID')    # Check for reserved words
+     return t
+
+
 # Compute column.
 #     input is the input text string
 #     token is a token instance
@@ -144,7 +150,6 @@ def find_column(inp, token):
 # Construyendo el analizador léxico
 import ply.lex as lex
 lexer = lex.lex()
-lexer = lex.lex(reflags= re.IGNORECASE)
 
 #Precedencia   solo estan las basicas
 precedence = (
@@ -152,17 +157,18 @@ precedence = (
     ('left','OR'),
     ('left','AND'),
     ('right','UNOT'),
-    ('left', 'MENQUE', 'MAYQUE','IGUALIGUAL'),
+    ('left', 'MENQUE', 'MAYQUE','IGUALIGUAL','MENIGUAL', 'MAYIGUAL'),
     ('left', 'MAS', 'MENOS'),
+    ('left','INCREMENTO','DECREMENTO'),
     ('left', 'POR', 'DIVIDIDO'),
     ('left','POW'),
     ('right','UMENOS'),
-    ('left','INCREMENTO','DECREMENTO'),
+
     
 
 )
 #Abstract
-from Instruccion import  For, Inc_Dec,Imprimir,Definicion,Asignacion,If,Break,While
+from Instruccion import  Case, For, Inc_Dec,Imprimir,Definicion,Asignacion,If,Break, Switch,While
 from Instruccion import Declaracion
 from expresiones import *
 from Tipo import OperadorLogico,OperadorAritmetico,OperadorRelacional,TIPO
@@ -259,10 +265,10 @@ def p_expresion_binaria(t):
     elif t[2] == '>': t[0] = Relacional(OperadorRelacional.MAYORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '==':   t[0] = Relacional(OperadorRelacional.IGUALIGUAL, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '**':   t[0] = Aritmetica(OperadorAritmetico.POT, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
-    elif t[2] == '<=': t[0] = Relacional(OperadorRelacional.MENORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
-    elif t[2] == '>=': t[0] = Relacional(OperadorRelacional.MAYORQUE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '<=': t[0] = Relacional(OperadorRelacional.MENORIGUAL, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '>=': t[0] = Relacional(OperadorRelacional.MAYORIGUAL, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '%': t[0] = Aritmetica(OperadorAritmetico.MOD, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
-    elif t[2] == '!=': t[0] = Relacional(OperadorRelacional.DIFERENTE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '=!': t[0] = Relacional(OperadorRelacional.DIFERENTE, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '&&': t[0] = Logica(OperadorLogico.AND, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '||': t[0] = Logica(OperadorLogico.OR, t[1],t[3], t.lineno(2), find_column(input, t.slice[2]))
 
@@ -305,6 +311,11 @@ def p_primitivo_cadena(t):
 
 def p_primitivo_char(t):
     'expresion : CHAR'
+    t[1]=str(t[1]).replace('\\t','\t')
+    t[1]=str(t[1]).replace('\\n','\n')
+    t[1]=str(t[1]).replace('\\\\','\\')
+    t[1]=str(t[1]).replace("\\'","\'")
+    t[1]=str(t[1]).replace('\\"','"')
     t[0] = Primitivos(TIPO.CHARACTER,str(t[1]).replace('\\n', '\n'), t.lineno(1), find_column(input, t.slice[1]))
 
 def p_primitivo_nulo(t):
@@ -339,12 +350,12 @@ def p_instrucion_definicion(t):
 
 def p_instruccion_definicion1(t):
     'definicion_instr1       : VAR ID IGUAL expresion'
-    t[0]=   Declaracion(t[1], t[2], t.lineno(2), find_column(input, t.slice[2]), t[4])
+    t[0]=   Declaracion(t[1], str(t[2]).lower(), t.lineno(2), find_column(input, t.slice[2]), t[4])
 
 def p_instruccion_definicion(t) :
     '''definicion_instr2     : VAR ID
         '''
-    t[0] =Definicion(t[2], t.lineno(1), find_column(input, t.slice[1]))
+    t[0] =Definicion(str(t[2]).lower(), t.lineno(1), find_column(input, t.slice[1]))
 
  
 #////////////////////////////////ASIGNAR VARIABLE ////////////////////////
@@ -384,10 +395,15 @@ def p_while(t) :
 
 
 
-
 def p_cicloFor(t) :
-    'for_instr     : RFOR PARIZQ definicion_instr PTCOMA expresion PTCOMA inc_dec PARDER LLAIZQ  instrucciones LLADER'
+    'for_instr     : RFOR PARIZQ definicion_instr PTCOMA expresion PTCOMA inc_dec_for PARDER LLAIZQ  instrucciones LLADER'
     t[0] = For(t[3], t[5],t[7],t[10], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_forpaso(t) :
+    '''inc_dec_for     : inc_dec
+                       | asignacion_instr'''
+    t[0] = t[1]
+
 
 
 def p_incremento_instruccion(t):
@@ -399,7 +415,15 @@ def p_incremento_instruccion(t):
 
 def p_switch(t) :
     'switch_instr     : RSWITCH PARIZQ expresion PARDER LLAIZQ cases_lista LLADER'
-    t[0] = For(t[3], t[6],t[6],t[6], t.lineno(1), find_column(input, t.slice[1]))
+    t[0] = Switch(t[3], t[6],None, t.lineno(1), find_column(input, t.slice[1]))
+
+def p_switch1(t) :
+    'switch_instr     : RSWITCH PARIZQ expresion PARDER LLAIZQ cases_lista  defecto LLADER'
+    t[0] = Switch(t[3], t[6],t[7], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_switch2(t) :
+    'switch_instr     : RSWITCH PARIZQ expresion PARDER LLAIZQ defecto LLADER'
+    t[0] = Switch(t[3], None,t[6], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_lista_casos(t) :
     'cases_lista    : cases_lista case'
@@ -415,24 +439,27 @@ def p_lista_casos_caso(t) :
         t[0] = [t[1]]
 
 def p_case_instruccion(t) :
-    '''case     :   RCASE expresion DPUNTOS instrucciones RBREAK
+    '''case     :   RCASE expresion DPUNTOS instrucciones
     '''
-    t[0] = t[1]
+    t[0] = Case(t[2],t[4], t.lineno(1), find_column(input, t.slice[1]))
 
+def p_default(t):
+    '''defecto      : DEFAULT DPUNTOS instrucciones'''
+    t[0]=t[3]
 
 import ply.yacc as yacc
 parser = yacc.yacc()
 input = ''
 
+
 def getErrores():
     return errores
 
 def parse(inp) :
-    global errores
+    global erroresS
     global lexer
     global parser
     errores = []
-    lexer = lex.lex()
     parser = yacc.yacc()
     global input
     input = inp
@@ -459,6 +486,10 @@ for instruccion in ast.getInstrucciones():      # REALIZAR LAS ACCIONES
     if isinstance(value, Excepcion) :
         ast.getExcepciones().append(value)
         ast.updateConsola(value.toString())
+    if isinstance(value, Break): 
+        err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+        ast.getExcepciones().append(err)
+        ast.updateConsola(err.toString())
 
 print(ast.getConsola())
 
