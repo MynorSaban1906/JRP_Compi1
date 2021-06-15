@@ -6,3 +6,5 @@ entrada.txt
 .gitignore
 PRUEBA.py
 GRAMATICA2
+.idea
+.vscode
