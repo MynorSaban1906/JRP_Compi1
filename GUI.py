@@ -1,9 +1,11 @@
-from tkinter import *               # ventana
+from p import lineas, posicion
+from tkinter import *           # ventana
 from tkinter import Menu            # barra de tareas
 from tkinter import scrolledtext    # textarea
 from tkinter import messagebox      # message box
 from tkinter import filedialog as fd # filechooser
 from tkinter import messagebox as mb
+import tkinter
 from gramatica import analizador
 
 
@@ -16,13 +18,11 @@ class GUI:
         self.nameFile=""
         self.txtEntrada = Entry(self.window,width=10)
         self.txtConsola = Entry(self.window,width=10)
-        self.txtrecorrido=Entry(self.window,width=10)
-        self.txtTOKEN=Entry(self.window,width=10)
         # Propiedades de la ventana
         self.window.title("ANALIZADOR - JPR")
         self.window.geometry('1600x1000')
         self.window.configure(bg = 'gray90')
-              
+        cont=1
 
         # creacion del menu
         self.menu = Menu(self.window)
@@ -59,6 +59,22 @@ class GUI:
 
 
         self.window.mainloop()
+
+    def lineas(self,*args):      #ACTUALIZAR LINEAS
+        self.lines.delete("all")
+        
+        cont = self.txtEntrada.index("@1,0")
+        while True :
+            dline= self.txtEntrada.dlineinfo(cont)
+            if dline is None: 
+                break
+            y = dline[1]
+            strline = str(cont).split(".")[0]
+            self.lines.create_text(2,y,anchor="nw", text=strline, font = ("Arial", 15))
+            cont = self.txtEntrada.index("%s+1line" % cont)
+
+    def posicion(self,event):    #ACTUALIZAR POSICION
+        self.pos.config(text = "[" + str(self.txtEntrada.index(INSERT)).replace(".",",") + "]" )
 
 
     def Analizar(self):
@@ -101,4 +117,7 @@ class GUI:
 
     def nuevo_archivo(self):
         self.txtEntrada.delete(0, 'end')
+
+
+
 start = GUI()
