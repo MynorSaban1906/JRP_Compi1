@@ -50,7 +50,7 @@ class Aritmetica(Instruccion):
         self.columna = columna
         self.tipo = None
 
-    
+
     def interpretar(self, tree, table):
         izq = self.OperacionIzq.interpretar(tree, table)
         if isinstance(izq, Excepcion): return izq
@@ -251,8 +251,9 @@ class Aritmetica(Instruccion):
 
         
         elif self.operador in (OperadorAritmetico.AUMENTO,OperadorAritmetico.DECREMENTO):# AUMENTO Y DECREMENTO
+            if not isinstance(self.OperacionIzq,ExpresionIdentificador): return Excepcion("Semantico", " Decremento no identificador", self.fila, self.columna)
             if self.operador==OperadorAritmetico.AUMENTO:
-                simbolo= Simbolo(self.OperacionIzq.getIdentificador(),self.OperacionIzq.tipo,self.fila,self.columna,self.obtenerVal(self.OperacionIzq.tipo, izq) + 1)
+                simbolo= Simbolo(self.OperacionIzq.identificador,self.OperacionIzq.tipo,self.fila,self.columna,self.obtenerVal(self.OperacionIzq.tipo, izq) + 1)
             elif self.operador==OperadorAritmetico.DECREMENTO:
                 simbolo= Simbolo(self.OperacionIzq.identificador,self.OperacionIzq.tipo,self.fila,self.columna,self.obtenerVal(self.OperacionIzq.tipo, izq) - 1)
             

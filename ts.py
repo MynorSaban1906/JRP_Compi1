@@ -47,7 +47,6 @@ class TablaSimbolos:
     def __init__(self, anterior = None):
         self.tabla = {} # Diccionario Vacio
         self.anterior = anterior
-        self.funciones = []
 
     def setTabla(self, simbolo):      # Agregar una variable
         if simbolo.id in self.tabla :
@@ -69,7 +68,7 @@ class TablaSimbolos:
         tablaActual = self
         while tablaActual != None: 
             if simbolo.id in tablaActual.tabla :
-                if tablaActual.tabla[simbolo.id].getTipo()==simbolo.getTipo() or  self.tabla[simbolo.id].getTipo()==TIPO.NULO or simbolo.getTipo()==TIPO.NULO:
+                if tablaActual.tabla[simbolo.id].getTipo()==simbolo.getTipo() or  tablaActual.tabla[simbolo.id].getTipo()==TIPO.NULO or simbolo.getTipo()==TIPO.NULO:
                     tablaActual.tabla[simbolo.id].setValor(simbolo.getValor())
                     tablaActual.tabla[simbolo.id].setTipo(simbolo.getTipo())
                     return None

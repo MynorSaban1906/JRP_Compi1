@@ -114,15 +114,18 @@ def t_CADENA(t):
     t.value = t.value[1:-1] # remuevo las comillas
     return t
 
+# Comentario de multiples lineas #* hola comentario multilinea.. *#
+def t_COMENTARIO_MULTILINEA(t):
+    r'\#\*(.|\n)*?\*\#'
+    t.lexer.lineno += t.value.count('\n')
+
+
 # Comentario simple // ...
 def t_COMENTARIO_SIMPLE(t):
     r'\#.*\n'
     t.lexer.lineno += 1
 
-# Comentario de multiples lineas #* hola comentario multilinea.. *#
-def t_COMENTARIO_MULTILINEA(t):
-    r'\#\*(.|\n)*?\*\#'
-    t.lexer.lineno += t.value.count('\n')
+
 # Caracteres ignorados
 t_ignore = " \t"
 
@@ -159,16 +162,15 @@ precedence = (
     ('right','UNOT'),
     ('left', 'MENQUE', 'MAYQUE','IGUALIGUAL','MENIGUAL', 'MAYIGUAL'),
     ('left', 'MAS', 'MENOS'),
-    ('left','INCREMENTO','DECREMENTO'),
     ('left', 'POR', 'DIVIDIDO'),
     ('left','POW'),
     ('right','UMENOS'),
-
+    ('left','AUMENTO','DECRECI'),
     
 
 )
 #Abstract
-from Instruccion import  Case, For, Inc_Dec,Imprimir,Definicion,Asignacion,If,Break, Switch,While
+from Instruccion import  Case, For, Inc_Dec,Imprimir,Definicion,Asignacion,If,Break, Main, Switch,While
 from Instruccion import Declaracion
 from expresiones import *
 from Tipo import OperadorLogico,OperadorAritmetico,OperadorRelacional,TIPO
@@ -204,6 +206,7 @@ def p_instruccion(t) :
                         |   inc_dec final
                         |   for_instr
                         |   switch_instr
+                        |   main_instr
     '''
     t[0] = t[1]
 
@@ -230,8 +233,8 @@ def p_imprimir(t) :
 #/////////////////////////////////////// incremento y decrecimiento +++ --  //////////////////////////////////////////////////
 
 def p_incremento_expresion(t):
-    '''expresion : expresion AUMENTO %prec INCREMENTO
-                | expresion DECRECI %prec DECREMENTO'''
+    '''expresion : expresion AUMENTO 
+                | expresion DECRECI'''
     if t[2]=='++': t[0] = Aritmetica(OperadorAritmetico.AUMENTO, t[1],None, t.lineno(2), find_column(input, t.slice[2]))
     elif t[2]=='--':t[0] = Aritmetica(OperadorAritmetico.DECREMENTO, t[1],None, t.lineno(2), find_column(input, t.slice[2]))
 
@@ -335,10 +338,6 @@ def p_expresion_id(t):
     'expresion : ID'
     t[0] = ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[1]))
 
-#///////////////////////////////////////FOR//////////////////////////////////////////////////
-
-
-
 
 
 #////////////////////////////////DEFINIR VARIABLE ////////////////////////
@@ -392,11 +391,15 @@ def p_while(t) :
     'while_instr     : RWHILE PARIZQ expresion PARDER LLAIZQ instrucciones LLADER'
     t[0] = While(t[3], t[6], t.lineno(1), find_column(input, t.slice[1]))
 
-
+def p_inicio_for(t):
+    '''inicial_for  :   definicion_instr1
+                    |   asignacion_instr
+    '''
+    t[0]=t[1]
 
 
 def p_cicloFor(t) :
-    'for_instr     : RFOR PARIZQ definicion_instr PTCOMA expresion PTCOMA inc_dec_for PARDER LLAIZQ  instrucciones LLADER'
+    'for_instr     : RFOR PARIZQ inicial_for PTCOMA expresion PTCOMA inc_dec_for PARDER LLAIZQ  instrucciones LLADER'
     t[0] = For(t[3], t[5],t[7],t[10], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_forpaso(t) :
@@ -407,9 +410,9 @@ def p_forpaso(t) :
 
 
 def p_incremento_instruccion(t):
-    '''inc_dec : ID AUMENTO %prec INCREMENTO
-                | ID DECRECI %prec DECREMENTO'''
-    if t[2]=='++': t[0] = Inc_Dec(ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.AUMENTO, t.lineno(1), find_column(input, t.slice[2]))
+    '''inc_dec : ID AUMENTO  
+                | ID DECRECI '''
+    if t[2]=='++': t[0] = (ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.AUMENTO, t.lineno(1), find_column(input, t.slice[2]))
     elif t[2]=='--': t[0] = Inc_Dec(ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.DECREMENTO, t.lineno(1), find_column(input, t.slice[2]))
 
 
@@ -447,6 +450,23 @@ def p_default(t):
     '''defecto      : DEFAULT DPUNTOS instrucciones'''
     t[0]=t[3]
 
+
+
+
+#///////////////////////////////////////MAIN//////////////////////////////////////////////////
+
+def p_main(t) :
+    'main_instr     : RMAIN PARIZQ PARDER LLAIZQ instrucciones LLADER'
+    t[0] = Main(t[5], t.lineno(1), find_column(input, t.slice[1]))
+
+
+
+
+
+
+
+
+
 import ply.yacc as yacc
 parser = yacc.yacc()
 input = ''
@@ -481,20 +501,47 @@ for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICO
     ast.getExcepciones().append(error)
     ast.updateConsola(error.toString())
 
-for instruccion in ast.getInstrucciones():      # REALIZAR LAS ACCIONES
-    value = instruccion.interpretar(ast,TSGlobal)
-    if isinstance(value, Excepcion) :
-        ast.getExcepciones().append(value)
-        ast.updateConsola(value.toString())
-    if isinstance(value, Break): 
-        err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+
+for instruccion in ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
+    if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion):
+        value = instruccion.interpretar(ast,TSGlobal)
+        if isinstance(value, Excepcion) :
+            ast.getExcepciones().append(value)
+            ast.updateConsola(value.toString())
+        if isinstance(value, Break): 
+            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+            ast.getExcepciones().append(err)
+            ast.updateConsola(err.toString())
+        
+for instruccion in ast.getInstrucciones():      # 2DA PASADA (MAIN)
+    contador = 0
+    if isinstance(instruccion, Main):
+        contador += 1
+        if contador == 2: # VERIFICAR LA DUPLICIDAD
+            err = Excepcion("Semantico", "Existen 2 funciones Main", instruccion.fila, instruccion.columna)
+            ast.getExcepciones().append(err)
+            ast.updateConsola(err.toString())
+            break
+        value = instruccion.interpretar(ast,TSGlobal)
+        if isinstance(value, Excepcion) :
+            ast.getExcepciones().append(value)
+            ast.updateConsola(value.toString())
+        if isinstance(value, Break): 
+            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+            ast.getExcepciones().append(err)
+            ast.updateConsola(err.toString())
+
+for instruccion in ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
+    if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)):
+        err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
         ast.getExcepciones().append(err)
         ast.updateConsola(err.toString())
 
 print(ast.getConsola())
 
 
-
+print("erorores")
+print(errores)
 
 
 
@@ -515,14 +562,6 @@ def analizador(entrada):
             ast.getExcepciones().append(value)
             ast.updateConsola(value.toString())
     return ast.getConsola()
-    
-
-
-
-    
-    
-    
-    
     
     '''
 
