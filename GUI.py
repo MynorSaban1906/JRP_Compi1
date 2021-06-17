@@ -1,13 +1,11 @@
-from p import lineas, posicion
-from tkinter import *           # ventana
+from tkinter import *            # ventana
 from tkinter import Menu            # barra de tareas
 from tkinter import scrolledtext    # textarea
 from tkinter import messagebox      # message box
 from tkinter import filedialog as fd # filechooser
 from tkinter import messagebox as mb
-import tkinter
-from gramatica import analizador
-
+from tkinter import Canvas,Frame
+import tkinter as tk
 
 class GUI:
  # Metodo que contiene la definicion de la interfaz grafica 
@@ -15,6 +13,7 @@ class GUI:
    
     def __init__(self):
         self.window = Tk()
+        
         self.nameFile=""
         self.txtEntrada = Entry(self.window,width=10)
         self.txtConsola = Entry(self.window,width=10)
@@ -22,8 +21,10 @@ class GUI:
         self.window.title("ANALIZADOR - JPR")
         self.window.geometry('1600x1000')
         self.window.configure(bg = 'gray90')
-        cont=1
-
+              
+        self.lbl = Label(self.window, text="Proyecto 1 - JPR", font=("Arial Bold", 15), bg='#24C14A')
+        self.lbl.pack(fill=X)  # Label estirado por el eje X en su posicion
+                
         # creacion del menu
         self.menu = Menu(self.window)
         #creacion de los submenu
@@ -34,7 +35,7 @@ class GUI:
         self.file_item.add_command(label='Guardar como', command=self.guardarcomo)
  
         self.herramienta_item = Menu(self.menu,tearoff=0)    # SUB MENU HERRAMIENTAS
-        self.herramienta_item.add_command(label='Interpretar',command=self.Analizar)
+        self.herramienta_item.add_command(label='Interpretar')
         self.herramienta_item.add_command(label='Debugger')
         
         self.report_item = Menu(self.menu,tearoff=0)    # SUB MENU REPORTES
@@ -50,7 +51,8 @@ class GUI:
 
 
         # propiedades del textarea
-        self.txtEntrada = scrolledtext.ScrolledText(self.window,width=80,height=25)   # textArea Entrada
+       # self.txtEntrada = scrolledtext.ScrolledText(self.window,width=80,height=25)   # textArea Entrada
+        self.txtEntrada= ScrollTextUwU.text(self.txtEntrada)
         self.txtEntrada.place(x=50, y = 50)
  
         self.txtConsola = scrolledtext.ScrolledText(self.window,width=70,height=25, background="black")   # textConsola area para la consola 
@@ -60,29 +62,6 @@ class GUI:
 
         self.window.mainloop()
 
-    def lineas(self,*args):      #ACTUALIZAR LINEAS
-        self.lines.delete("all")
-        
-        cont = self.txtEntrada.index("@1,0")
-        while True :
-            dline= self.txtEntrada.dlineinfo(cont)
-            if dline is None: 
-                break
-            y = dline[1]
-            strline = str(cont).split(".")[0]
-            self.lines.create_text(2,y,anchor="nw", text=strline, font = ("Arial", 15))
-            cont = self.txtEntrada.index("%s+1line" % cont)
-
-    def posicion(self,event):    #ACTUALIZAR POSICION
-        self.pos.config(text = "[" + str(self.txtEntrada.index(INSERT)).replace(".",",") + "]" )
-
-
-    def Analizar(self):
-        self.txtEntrada.delete(0, 'end')
-        
-        entrada= self.txtEntrada.get("1.0",END) # FILA 1 COLUMNA 0
-        scanner= analizador(entrada)
-        self.txtConsola.insert("1.0",scanner)
 
 
     # Dispara el Filechooser
@@ -118,6 +97,71 @@ class GUI:
     def nuevo_archivo(self):
         self.txtEntrada.delete(0, 'end')
 
+
+# -------- CLASE PARA PODER COLOCAR NUMEROS EN LA CONSOLA DE ENTRADA -----------
+class ScrollTextUwU(tk.Frame):
+    def __init__(self, master, *args, **kwargs):
+        tk.Frame.__init__(self, *args, **kwargs)
+        # bg -> color de fondo --- foreground -> color al texto --- selectbrackgroud -> color a lo que seleccione ---
+        # inserbackgroud -> color al puntero
+        self.text = tk.Text(self, bg='#FFFFFF', foreground="#000000", selectbackground="#C8C8C8",
+                            insertbackground='#000000',  width=80, height=25)
+        self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
+        self.text.configure(yscrollcommand=self.scrollbar.set)
+
+        self.numero_lineas = TextoLinea(self, width=35, bg='#D5D5D5')
+        self.numero_lineas.attach(self.text)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.numero_lineas.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 0))
+        self.text.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+        self.text.bind("<Key>", self.onPressDelay)
+        self.text.bind("<Button-1>", self.numero_lineas.redraw)
+        self.scrollbar.bind("<Button-1>", self.onScrollPress)
+        self.text.bind("<MouseWheel>", self.onPressDelay)
+
+    def onScrollPress(self, *args):
+        self.scrollbar.bind("<B1-Motion>", self.numero_lineas.redraw)
+
+    def onScrollRelease(self, *args):
+        self.scrollbar.unbind("<B1-Motion>", self.numero_lineas.redraw)
+
+    def onPressDelay(self, *args):
+        self.after(2, self.numero_lineas.redraw)
+
+    def get(self, *args, **kwargs):
+        return self.text.get(*args, **kwargs)
+
+    def insert(self, *args, **kwargs):
+        return self.text.insert(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return self.text.delete(*args, **kwargs)
+
+    def index(self, *args, **kwargs):
+        return self.text.index(*args, **kwargs)
+
+    def redraw(self):
+        self.numero_lineas.redraw()
+
+class TextoLinea(tk.Canvas):
+    def __init__(self, *args, **kwargs):
+        tk.Canvas.__init__(self, *args, **kwargs, highlightthickness=0)
+        self.textwidget = None
+
+    def attach(self, text_widget):
+        self.textwidget = text_widget
+
+    def redraw(self, *args):
+        self.delete("all")
+        i = self.textwidget.index("@0,0")
+        while True :
+            dline= self.textwidget.dlineinfo(i)
+            if dline is None: break
+            y = dline[1]
+            linenum = str(i).split(".")[0]
+            self.create_text(2, y, anchor="nw", text=linenum, fill="#606366")
+            i = self.textwidget.index("%s+1line" % i)
 
 
 start = GUI()

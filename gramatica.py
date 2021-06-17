@@ -412,7 +412,7 @@ def p_forpaso(t) :
 def p_incremento_instruccion(t):
     '''inc_dec : ID AUMENTO  
                 | ID DECRECI '''
-    if t[2]=='++': t[0] = (ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.AUMENTO, t.lineno(1), find_column(input, t.slice[2]))
+    if t[2]=='++': t[0] = Inc_Dec(ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.AUMENTO, t.lineno(1), find_column(input, t.slice[2]))
     elif t[2]=='--': t[0] = Inc_Dec(ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[2])),t[1],OperadorAritmetico.DECREMENTO, t.lineno(1), find_column(input, t.slice[2]))
 
 
