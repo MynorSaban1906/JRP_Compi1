@@ -1,6 +1,30 @@
+#se importan las clases necesarias 
 import re
 
-from Excepcion import Excepcion
+from Instrucciones.Asignacion import Asignacion
+from Instrucciones.Break import Break
+from Instrucciones.Declaracion import Declaracion
+from Instrucciones.Definicion import Definicion
+from Instrucciones.For import For
+from Instrucciones.If import If
+from Instrucciones.Imprimir import Imprimir
+from Instrucciones.Inc_Dec import Inc_Dec
+from Instrucciones.Main import Main
+from Instrucciones.Switch import Switch
+from Instrucciones.While import While
+from Instrucciones.Case import Case
+
+
+from Expresiones.Aritmetica import Aritmetica
+from Expresiones.ExpresionIdentificador import ExpresionIdentificador
+from Expresiones.Logica import Logica
+from Expresiones.Primitivos import Primitivos
+from Expresiones.Relacional import Relacional
+from TablaArbol.Tipo import TIPO,OperadorAritmetico,OperadorLogico,OperadorRelacional
+from TablaArbol.Excepcion import Excepcion
+from TablaArbol.Arbol import Arbol
+from TablaArbol.ts import TablaSimbolos
+
 
 errores = []
 
@@ -132,9 +156,8 @@ t_ignore = " \t"
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
-    
 def t_error(t):
-    errores.append(Excepcion("Lexico","Error léxico." + t.value[0] , t.lexer.lineno, find_column(input, t)))
+    errores.append(Excepcion("Lexico","El caracter \"" + t.value[0]+"\" no pertenece al lenguaje" , t.lexer.lineno, find_column(input, t)))
     t.lexer.skip(1)
 
 def t_ID(t):
@@ -170,10 +193,7 @@ precedence = (
 
 )
 #Abstract
-from Instruccion import  Case, For, Inc_Dec,Imprimir,Definicion,Asignacion,If,Break, Main, Switch,While
-from Instruccion import Declaracion
-from expresiones import *
-from Tipo import OperadorLogico,OperadorAritmetico,OperadorRelacional,TIPO
+
 
 def p_init(t) :
     'init            : instrucciones'
@@ -220,7 +240,7 @@ def p_finins(t) :
 
 def p_instruccion_error(t):
     '''instruccion      : error final'''
-    errores.append(Excepcion("Sintáctico","Error Sintáctico. " + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
+    errores.append(Excepcion("Sintactico","Error Sintactico con " + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
     t[0] = ""
 #///////////////////////////////////////IMPRIMIR//////////////////////////////////////////////////
 
@@ -286,8 +306,6 @@ def p_expresion_unaria(t):
         t[0] = Aritmetica(OperadorAritmetico.UMENOS, t[2],None, t.lineno(1), find_column(input, t.slice[1]))
     elif t[1] == '!':
         t[0] = Logica(OperadorLogico.NOT, t[2],None, t.lineno(1), find_column(input, t.slice[1]))
-
-
 
 
 def p_expresion_agrupacion(t):
@@ -476,7 +494,7 @@ def getErrores():
     return errores
 
 def parse(inp) :
-    global erroresS
+    global errores
     global lexer
     global parser
     errores = []
@@ -487,68 +505,11 @@ def parse(inp) :
 
 #INTERFAZ
 
-from Arbol import Arbol
-from ts import TablaSimbolos
-f = open("./entrada.txt", "r")
-entrada = f.read()
-
-
-instrucciones = parse(entrada) #ARBOL AST
-ast = Arbol(instrucciones)
-TSGlobal = TablaSimbolos()
-ast.setTSglobal(TSGlobal)
-for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
-    ast.getExcepciones().append(error)
-    ast.updateConsola(error.toString())
-
-
-for instruccion in ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
-    if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion):
-        value = instruccion.interpretar(ast,TSGlobal)
-        if isinstance(value, Excepcion) :
-            ast.getExcepciones().append(value)
-            ast.updateConsola(value.toString())
-        if isinstance(value, Break): 
-            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
-            ast.getExcepciones().append(err)
-            ast.updateConsola(err.toString())
-        
-for instruccion in ast.getInstrucciones():      # 2DA PASADA (MAIN)
-    contador = 0
-    if isinstance(instruccion, Main):
-        contador += 1
-        if contador == 2: # VERIFICAR LA DUPLICIDAD
-            err = Excepcion("Semantico", "Existen 2 funciones Main", instruccion.fila, instruccion.columna)
-            ast.getExcepciones().append(err)
-            ast.updateConsola(err.toString())
-            break
-        value = instruccion.interpretar(ast,TSGlobal)
-        if isinstance(value, Excepcion) :
-            ast.getExcepciones().append(value)
-            ast.updateConsola(value.toString())
-        if isinstance(value, Break): 
-            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
-            ast.getExcepciones().append(err)
-            ast.updateConsola(err.toString())
-
-for instruccion in ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
-    if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)):
-        err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
-        ast.getExcepciones().append(err)
-        ast.updateConsola(err.toString())
-
-print(ast.getConsola())
-
-
-print("erorores")
-print(errores)
 
 
 
 
-'''
 def analizador(entrada):
-    variablesG.clear()
     instrucciones = parse(entrada) #ARBOL AST
     ast = Arbol(instrucciones)
     TSGlobal = TablaSimbolos()
@@ -556,13 +517,48 @@ def analizador(entrada):
     for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
         ast.getExcepciones().append(error)
         ast.updateConsola(error.toString())
-    for instruccion in ast.getInstrucciones():      # REALIZAR LAS ACCIONES
-        value = instruccion.interpretar(ast,TSGlobal)
-        if isinstance(value, Excepcion) :
-            ast.getExcepciones().append(value)
-            ast.updateConsola(value.toString())
-    return ast.getConsola()
-    
-    '''
 
+
+    for instruccion in ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
+        if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion):
+            value = instruccion.interpretar(ast,TSGlobal)
+            if isinstance(value, Excepcion) :
+                ast.getExcepciones().append(value)
+                ast.updateConsola(value.toString())
+            if isinstance(value, Break): 
+                err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+                ast.getExcepciones().append(err)
+                ast.updateConsola(err.toString())
+            
+    for instruccion in ast.getInstrucciones():      # 2DA PASADA (MAIN)
+        contador = 0
+        if isinstance(instruccion, Main):
+            contador += 1
+            if contador == 2: # VERIFICAR LA DUPLICIDAD
+                err = Excepcion("Semantico", "Existen 2 funciones Main", instruccion.fila, instruccion.columna)
+                ast.getExcepciones().append(err)
+                ast.updateConsola(err.toString())
+                break
+            value = instruccion.interpretar(ast,TSGlobal)
+            if isinstance(value, Excepcion) :
+                ast.getExcepciones().append(value)
+                ast.updateConsola(value.toString())
+            if isinstance(value, Break): 
+                err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+                ast.getExcepciones().append(err)
+                ast.updateConsola(err.toString())
+
+    for instruccion in ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
+        if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)):
+            err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
+            ast.getExcepciones().append(err)
+            ast.updateConsola(err.toString())
+
+
+
+    return ast.getConsola()
+
+def listaErrores():
+    return errores
+    
     

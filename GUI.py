@@ -8,6 +8,28 @@ from tkinter import messagebox as mb
 from tkinter import Canvas,Frame
 import tkinter as tk
 import webbrowser
+from gramatica import listaErrores,analizador
+
+
+reservadas = {
+
+    'print',
+    'var' ,
+    'null',
+    'if',
+    'else', 
+    'true',
+    'false',
+    'while',
+    'break',
+    'for',
+    'switch',
+    'case',
+    'default',
+    'main',
+    'func',
+
+}
 
 
 class GUI:
@@ -38,7 +60,7 @@ class GUI:
         self.file_item.add_command(label='Guardar como', command=self.guardarcomo)
  
         self.herramienta_item = Menu(self.menu,tearoff=0)    # SUB MENU HERRAMIENTAS
-        self.herramienta_item.add_command(label='Interpretar')
+        self.herramienta_item.add_command(label='Interpretar',command=self.analizar)
         self.herramienta_item.add_command(label='Debugger')
         
         self.report_item = Menu(self.menu,tearoff=0)    # SUB MENU REPORTES
@@ -106,11 +128,17 @@ class GUI:
             self.guardarcomo()
 
     def nuevo_archivo(self):
-        self.txtEntrada.delete(0, 'end')
+        self.txtEntrada.delete(1.0, END)
+
+    def analizar(self):
+        self.txtConsola.delete(1.0, END)
+        entrada= self.txtEntrada.get("1.0",END) # FILA 1 COLUMNA 0
+        scanner= analizador(entrada)
+        self.txtConsola.insert("1.0",scanner)        
+
 
     def reporte1(self):
         contador=1
-
         f = open('Reporte.html','w')
 
         mensaje = """
@@ -131,7 +159,7 @@ class GUI:
             <h1 class ="bg-success text-center">Tablas de Errores <h1>
             </br>
             <div class= container>
-                <h4 class ="bg-warning">Errores lexicos <h4>
+                <h4 class ="bg-warning">Errores lexicos y Sintacticos <h4>
                 <table class="table  table-hover   table-bordered"" >
                 <thead class="thead-dark"  >
                     <tr>
@@ -143,31 +171,11 @@ class GUI:
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    </tr>
-                    <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    </tr>
 
-
-                    <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
-                    </tr>
         """
         datos="<tr>"
-        lista = ["hola","jaunito","jojo"]
-        for x in lista:
-            datos+="\n<th scope=\"row\">" +str(contador)+"</th>\n<td>"+x+"</td></tr>"
+        for x in listaErrores():
+            datos+="\n<th scope=\"row\">" +str(contador)+"</th>\n<td>"+x.tipo+"</td>\n<td>"+x.descripcion+"</td><td>"+str(x.fila)+"</td><td>"+str(x.columna)+"</td><tr>"
             contador=contador +1
 
         mensaje2="""    <tr>
@@ -200,8 +208,6 @@ class GUI:
 
         webbrowser.open_new_tab('Reporte.html')
 
-
-
     def getInfo(self, event):
         self.txtEntrada.text.bind("<Button-1>", self.getInfo) # Clik derecho 
         self.txtEntrada.text.bind("<Button-2>", self.getInfo) # Click izquierdo
@@ -215,6 +221,17 @@ class GUI:
         columna= string[1]
 
         self.posicion.config(text=f" Linea: "+fila+"      Columa:  "+columna)
+
+
+    def pintar(self):
+        #para pintar se realiza un analizador a patita, se hace para cuando haga match entonces pinte de un color
+        lista = [] #para guardar las palabras
+        palabra = ''
+        contador = 0
+        texto=self.txtEntrada.get("1.0",END)+"$"
+
+        while contador<=len(texto): # cuenta todas las letras que se ingreso en el cuadro de texto
+            
 
 # -------- CLASE PARA PODER COLOCAR NUMEROS EN LA CONSOLA DE ENTRADA -----------
 class ScrollTextUwU(tk.Frame):
