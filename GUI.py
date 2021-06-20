@@ -8,6 +8,7 @@ from tkinter import messagebox as mb
 from tkinter import Canvas,Frame
 import tkinter as tk
 import webbrowser
+import re
 from gramatica import listaErrores,analizador
 
 
@@ -40,15 +41,15 @@ class GUI:
         self.window = Tk()
         
         self.nameFile=""
-        self.txtEntrada = Entry(self.window,width=10)
-        self.txtConsola = Entry(self.window,width=10)
+        self.Entrada = Entry(self.window,width=10)
+        self.Consola = Entry(self.window,width=10)
         # Propiedades de la ventana
-        self.window.title("ANALIZADOR - JPR")
+        self.window.title("ANALIZADOR - JPR - Vacaciones 2021 Junio")
         self.window.geometry('1600x1000')
-        self.window.configure(bg = 'gray90')
+        self.window.configure(bg = 'light slate gray')
               
-        # self.lbl = Label(self.window, text="Proyecto 1 - JPR", font=("Arial Bold", 15), bg='#24C14A')
-        # self.lbl.pack(fill=X)  # Label estirado por el eje X en su posicion
+        self.Inicial = Label(self.window, text="Proyecto 1 - Fase 1", font=("Times New Roman", 18), bg='turquoise1')
+        self.Inicial.pack(fill=X) 
                 
         # creacion del menu
         self.menu = Menu(self.window)
@@ -76,22 +77,23 @@ class GUI:
 
 
         # propiedades del textarea
-       # self.txtEntrada = scrolledtext.ScrolledText(self.window,width=80,height=25)   # textArea Entrada
-        self.txtEntrada= ScrollTextUwU(self.txtEntrada)
-        self.txtEntrada.place(x=50, y = 50)
- 
-        self.txtConsola = scrolledtext.ScrolledText(self.window,width=70,height=25, background="black")   # textConsola area para la consola 
-        self.txtConsola.place(x=750, y =50) 
-        self.txtConsola.config(fg="green3",bg="gray20")      
+       # self.Entrada = scrolledtext.ScrolledText(self.window,width=80,height=25)   # textArea Entrada
+
+        self.Entrada= TextoAccion(self.Entrada)
+        self.Entrada.place(x=50, y = 50) 
+
+
+        self.Consola = scrolledtext.ScrolledText(self.window,width=70,height=25, background="black")   # textConsola area para la consola 
+        self.Consola.place(x=750, y =50) 
+        self.Consola.config(fg="lawn green",bg="gray20")      
 
 
         self.posicion = Label(self.window,text=f" Linea: 0      Columa: 0", font=("Times New Roman", 13), bg='deep sky blue')
         self.posicion.pack(side = BOTTOM, fill= X)
 
-        self.txtEntrada.text.bind("<Button-1>", self.getInfo) # Clik derecho 
-        self.txtEntrada.text.bind("<Button-2>", self.getInfo) # Click izquierdo
-        self.txtEntrada.text.bind("<Button-3>", self.getInfo) # ruedita  
-
+        self.Entrada.text.bind("<Button-1>", self.ObtenerFilaColumna) # Clik derecho 
+        self.Entrada.text.bind("<Button-2>", self.ObtenerFilaColumna) # Click izquierdo
+        self.Entrada.text.bind("<Button-3>", self.ObtenerFilaColumna) # ruedita  
 
         self.window.mainloop()
 
@@ -104,21 +106,24 @@ class GUI:
             archi1=open(self.nameFile, "r", encoding="utf-8")
             contenido=archi1.read()
             archi1.close()
-            self.txtEntrada.delete("1.0", END)
-            self.txtEntrada.insert("1.0", contenido) 
+            self.Entrada.delete("1.0", END)
+            for letra in self.pintar(contenido):
+                self.Entrada.insert(INSERT,letra[1],letra[0])
+
+            self.Consola.delete("1.0","end") 
 
     def guardarcomo(self):
         self.nameFile=fd.asksaveasfilename(initialdir = "/",title = "Guardar como",filetypes = (("jpr files","*.jpr"),("todos los archivos","*.*")))
         if self.nameFile!="":
-            self.nameFile=self.nameFile+".jpr"
+            self.nameFile=self.nameFile
             archi1=open(self.nameFile, "w", encoding="utf-8")
-            archi1.write(self.txtEntrada.get("1.0", END))
+            archi1.write(self.Entrada.get("1.0", END))
             archi1.close()
             mb.showinfo("Información", "Los datos fueron guardados en el archivo.")
         
     def guardar(self):
         if self.nameFile!="":
-            contenido =self.txtEntrada.get(1.0,'end-1c')
+            contenido =self.Entrada.get(1.0,'end-1c')
             fichero=open(self.nameFile,'w+')
             fichero.write(contenido)
             fichero.close()
@@ -128,13 +133,13 @@ class GUI:
             self.guardarcomo()
 
     def nuevo_archivo(self):
-        self.txtEntrada.delete(1.0, END)
+        self.Entrada.delete(1.0, END)
 
     def analizar(self):
-        self.txtConsola.delete(1.0, END)
-        entrada= self.txtEntrada.get("1.0",END) # FILA 1 COLUMNA 0
+        self.Consola.delete(1.0, END)
+        entrada= self.Entrada.get("1.0",END) # FILA 1 COLUMNA 0
         scanner= analizador(entrada)
-        self.txtConsola.insert("1.0",scanner)        
+        self.Consola.insert("1.0",scanner)        
 
 
     def reporte1(self):
@@ -208,68 +213,182 @@ class GUI:
 
         webbrowser.open_new_tab('Reporte.html')
 
-    def getInfo(self, event):
-        self.txtEntrada.text.bind("<Button-1>", self.getInfo) # Clik derecho 
-        self.txtEntrada.text.bind("<Button-2>", self.getInfo) # Click izquierdo
-        self.txtEntrada.text.bind("<Button-3>", self.getInfo) # ruedita 
-
-
-
+    def ObtenerFilaColumna(self, event):
+        self.Entrada.text.bind("<Button-1>", self.ObtenerFilaColumna) # Clik derecho 
+        self.Entrada.text.bind("<Button-2>", self.ObtenerFilaColumna) # Click izquierdo
+        self.Entrada.text.bind("<Button-3>", self.ObtenerFilaColumna) # ruedita 
         
-        string = self.txtEntrada.text.index(INSERT).split(".")
-        fila= string[0]
-        columna= string[1]
+        info = self.Entrada.text.index(INSERT).split(".")
+        fila= info[0]
+        columna= info[1]
 
         self.posicion.config(text=f" Linea: "+fila+"      Columa:  "+columna)
 
 
-    def pintar(self):
+    def pintar(self,texto):
         #para pintar se realiza un analizador a patita, se hace para cuando haga match entonces pinte de un color
         lista = [] #para guardar las palabras
         palabra = ''
+        caracter=''
         contador = 0
-        texto=self.txtEntrada.get("1.0",END)+"$"
-
-        while contador<=len(texto): # cuenta todas las letras que se ingreso en el cuadro de texto
+        
+        # recorre la entrada 
+        while contador<len(texto): # cuenta todas las letras que se ingreso en el cuadro de texto
+            caracter = texto[contador]
+            # verifica si lo que entra se encuentra entre letra o numero  estado letra o digito
+            if re.search(r"[a-zA-Z0-9]", caracter): 
+                palabra += caracter # para identificar un id o palabra reservada
             
+            #estado de cadena con comilla doble
+            elif caracter== '"': 
+                while(True):
+                    caracter=texto[contador]
+                    palabra+=caracter
+                    if re.match(r'\"(\\"|.)*?\"',palabra):
+                        cadena=[]
+                        cadena.append("cadena")
+                        cadena.append(palabra)
+                        lista.append(cadena)
+                        palabra=''
+                        break
+                    contador+=1
+            # estado de cadena con comilla simple                        
+            elif caracter=="'":
+                copia=contador
+                verifi=0
+                while(True):
+                    caracter=texto[contador]
+                    palabra+=caracter
+                    if re.match(r'\'(\\"|.)*?\'',palabra):
+                        cadena=[]
+                        cadena.append("cadena")
+                        cadena.append(palabra)
+                        lista.append(cadena)
+                        palabra=''
+                        break
+                    contador+=1
+                    verifi+=1
+                    if verifi>3:
+                        err=[]
+                        palabra=''
+                        palabra=texto[copia:len(texto)]
+                        err.append("err")
+                        err.append(palabra)
+                        lista.append(err)
+                        palabra=''
+                        contador=len(texto)+1
+                        break                                    
+            
+            # estado de comentarios
+            elif caracter=='#':
+                palabra +=caracter
+                if texto[contador+1]!='*':
+                    while(caracter!="\n"):
+                        contador+=1
+                        caracter=texto[contador]
+                        palabra+=caracter
+                    if re.match(r'\#.*\n',palabra): # si si es igual crea el comentario
+                        comentario=[]
+                        comentario.append("comentario")
+                        comentario.append(palabra)
+                        lista.append(comentario)
+                        palabra=''
+                else:
+                    while(True):
+                        if caracter=="*" and texto[contador+1]=="#":
+                            contador+=1
+                            caracter=texto[contador]
+                            palabra+=caracter
+                            break
+                        contador+=1
+                        caracter=texto[contador]
+                        palabra+=caracter
+                        
+                        
+                       
 
-# -------- CLASE PARA PODER COLOCAR NUMEROS EN LA CONSOLA DE ENTRADA -----------
-class ScrollTextUwU(tk.Frame):
+                    if re.match(r'\#\*(.|\n)*?\*\#',palabra):
+                        comentario=[]
+                        comentario.append("comentario")
+                        comentario.append(palabra)
+                        lista.append(comentario)
+
+                        palabra=''
+                        
+            #estado de aceptacion            
+            else:
+                if re.search(r'[a-zA-Z][a-zA-Z0-9_]*',palabra):
+                    id=[]
+                    id.append("variable")
+                    id.append(palabra)
+                    lista.append(id)
+                    palabra=''
+
+
+                elif re.match(r'(\d+\.\d+|\d+)',palabra):
+                    num=[]
+                    num.append("numero")
+                    num.append(palabra)
+                    lista.append(num)
+                    palabra=''
+
+                
+                otros=[]
+                otros.append("otro")
+                otros.append(texto[contador])
+                lista.append(otros)
+            
+            contador+=1
+        
+        for pal in lista:
+            if pal[1].lower() in reservadas:
+                pal[0]="reservadas"
+
+
+        return lista
+
+class TextoAccion(tk.Frame):
     def __init__(self, master, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
         # bg -> color de fondo --- foreground -> color al texto --- selectbrackgroud -> color a lo que seleccione ---
         # inserbackgroud -> color al puntero
-        self.text = tk.Text(self, bg='#FFFFFF', foreground="#000000", selectbackground="#C8C8C8",
-                            insertbackground='#000000',  width=80, height=25)
+        self.text = tk.Text(self, bg='#103045', foreground="white", selectbackground="steel blue",
+                            insertbackground='white',  width=78, height=25)
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         self.text.configure(yscrollcommand=self.scrollbar.set)
 
-        self.numero_lineas = TextoLinea(self, width=35, bg='#D5D5D5')
-        self.numero_lineas.attach(self.text)
+        self.nLineas = TextoLinea(self, width=30, bg='azure')
+        self.nLineas.attach(self.text)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.numero_lineas.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 0))
+        self.nLineas.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 0))
         self.text.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
 
         self.scrollbar.bind("<Motion>", self.onScrollRelease)
-        self.text.bind("<Motion>", self.numero_lineas.redraw)
+        self.text.bind("<Motion>", self.nLineas.redraw)
         self.text.bind("<Key>", self.onPressDelay)
-        self.text.bind("<Button-1>", self.numero_lineas.redraw)
+        self.text.bind("<Button-1>", self.nLineas.redraw)
         self.scrollbar.bind("<Button-1>", self.onScrollPress)
-        self.scrollbar.bind("<Motion>", self.numero_lineas.redraw)
+        self.scrollbar.bind("<Motion>", self.nLineas.redraw)
         self.text.bind("<MouseWheel>", self.onPressDelay)
 
 
-
+        self.text.tag_config('comentario', foreground='gray')
+        self.text.tag_config('otro', foreground='white')
+        self.text.tag_config('reservadas', foreground='sky blue')
+        self.text.tag_config('cadena', foreground='orange')
+        self.text.tag_config('variable', foreground='white')
+        self.text.tag_config('err', foreground='red')
+        self.text.tag_config('numero', foreground='DarkOrchid1')
 
     def onScrollPress(self, *args):
-        self.scrollbar.bind("<B1-Motion>", self.numero_lineas.redraw)
+        self.scrollbar.bind("<B1-Motion>", self.nLineas.redraw)
 
     def onScrollRelease(self, *args):
-        self.scrollbar.unbind("<B1-Motion>", self.numero_lineas.redraw)
+        self.scrollbar.unbind("<B1-Motion>", self.nLineas.redraw)
 
     def onPressDelay(self, *args):
-        self.after(2, self.numero_lineas.redraw)
+        self.after(2, self.nLineas.redraw)
 
     def get(self, *args, **kwargs):
         return self.text.get(*args, **kwargs)
@@ -284,8 +403,11 @@ class ScrollTextUwU(tk.Frame):
         return self.text.index(*args, **kwargs)
 
     def redraw(self):
-        self.numero_lineas.redraw()
+        self.nLineas.redraw()
 
+    def tag_configure(self, tagName, cnf=None, **kw):
+        """Configure a tag TAGNAME."""
+        return self._configure(('tag', 'configure', tagName), cnf, kw)
 
 class TextoLinea(tk.Canvas):
     def __init__(self, *args, **kwargs):

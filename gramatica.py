@@ -33,7 +33,6 @@ reservadas = {
     'print' : 'PRINT',
     'var' : 'VAR',
     'null':'NULO',
-    
 
     'if'        : 'RIF',
     'else'      : 'RELSE', 
