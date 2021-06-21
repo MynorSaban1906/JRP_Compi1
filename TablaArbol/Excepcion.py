@@ -4,6 +4,6 @@ class Excepcion:
         self.descripcion = descripcion
         self.fila = fila
         self.columna = columna
-
+    # metodo que devuelve el objeto 
     def toString(self):
         return self.tipo + " - " + self.descripcion + " [" + str(self.fila) + "," + str(self.columna) + "]"

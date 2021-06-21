@@ -1,10 +1,10 @@
 class Arbol:
     def __init__(self, instrucciones ):
-        self.instrucciones = instrucciones
-        self.excepciones = []
-        self.funciones=[]
+        self.instrucciones = instrucciones # son de tipo instrucciones
+        self.excepciones = [] #para las excepciones, estas se guardan en objetos en esta tabla
+        self.funciones=[]   # para las funcioes
         self.consola = ""
-        self.TSglobal = None
+        self.TablaSimboloGlobal = None # al inicial inicia en NOne
 
     def getInstrucciones(self):
         return self.instrucciones
@@ -27,11 +27,11 @@ class Arbol:
     def updateConsola(self,cadena):
         self.consola += str(cadena) + '\n'
 
-    def getTSGlobal(self):
-        return self.TSglobal
+    def getTablaSimboloGlobal(self):
+        return self.TablaSimboloGlobal
     
-    def setTSglobal(self, TSglobal):
-        self.TSglobal = TSglobal
+    def setTablaSimboloGlobal(self, TablaSimboloGlobal):
+        self.TablaSimboloGlobal = TablaSimboloGlobal
 
 
     def getFunciones(self):

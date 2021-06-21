@@ -184,7 +184,7 @@ precedence = (
     ('right','UNOT'),
     ('left', 'MENQUE', 'MAYQUE','IGUALIGUAL','MENIGUAL', 'MAYIGUAL'),
     ('left', 'MAS', 'MENOS'),
-    ('left', 'POR', 'DIVIDIDO'),
+    ('left', 'POR', 'DIVIDIDO','MODULO'),
     ('left','POW'),
     ('right','UMENOS'),
     ('left','AUMENTO','DECRECI'),
@@ -510,52 +510,54 @@ def parse(inp) :
 
 def analizador(entrada):
     instrucciones = parse(entrada) #ARBOL AST
-    ast = Arbol(instrucciones)
-    TSGlobal = TablaSimbolos()
-    ast.setTSglobal(TSGlobal)
+    Arbol_ast = Arbol(instrucciones)
+    TablaSimboloGlobal = TablaSimbolos()
+    Arbol_ast.setTablaSimboloGlobal(TablaSimboloGlobal)
     for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
-        ast.getExcepciones().append(error)
-        ast.updateConsola(error.toString())
+        Arbol_ast.getExcepciones().append(error)
+        Arbol_ast.updateConsola(error.toString())
 
 
-    for instruccion in ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
+    for instruccion in Arbol_ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
         if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion):
-            value = instruccion.interpretar(ast,TSGlobal)
+            value = instruccion.interpretar(Arbol_ast,TablaSimboloGlobal)
             if isinstance(value, Excepcion) :
-                ast.getExcepciones().append(value)
-                ast.updateConsola(value.toString())
+                Arbol_ast.getExcepciones().append(value)
+                Arbol_ast.updateConsola(value.toString())
             if isinstance(value, Break): 
                 err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
-                ast.getExcepciones().append(err)
-                ast.updateConsola(err.toString())
+                Arbol_ast.getExcepciones().append(err)
+                Arbol_ast.updateConsola(err.toString())
             
-    for instruccion in ast.getInstrucciones():      # 2DA PASADA (MAIN)
+    for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
         contador = 0
         if isinstance(instruccion, Main):
             contador += 1
             if contador == 2: # VERIFICAR LA DUPLICIDAD
                 err = Excepcion("Semantico", "Existen 2 funciones Main", instruccion.fila, instruccion.columna)
-                ast.getExcepciones().append(err)
-                ast.updateConsola(err.toString())
+                Arbol_ast.getExcepciones().append(err)
+                Arbol_ast.updateConsola(err.toString())
                 break
-            value = instruccion.interpretar(ast,TSGlobal)
+            value = instruccion.interpretar(Arbol_ast,TablaSimboloGlobal)
             if isinstance(value, Excepcion) :
-                ast.getExcepciones().append(value)
-                ast.updateConsola(value.toString())
+                Arbol_ast.getExcepciones().append(value)
+                Arbol_ast.updateConsola(value.toString())
             if isinstance(value, Break): 
                 err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
-                ast.getExcepciones().append(err)
-                ast.updateConsola(err.toString())
+                Arbol_ast.getExcepciones().append(err)
+                Arbol_ast.updateConsola(err.toString())
 
-    for instruccion in ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
+    for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
         if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)):
             err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
-            ast.getExcepciones().append(err)
-            ast.updateConsola(err.toString())
+            Arbol_ast.getExcepciones().append(err)
+            Arbol_ast.updateConsola(err.toString())
 
 
-
-    return ast.getConsola()
+    for err in Arbol_ast.getExcepciones():
+        errores.append(err)
+    print(Arbol_ast.getConsola())  
+    return Arbol_ast.getConsola()
 
 def listaErrores():
     return errores

@@ -3,7 +3,8 @@ from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
 
 
-
+# identifica que que tipo y obtiene el valor de ella 
+# aqui se verifica si ya existe y si no lo guarda la variable
 class ExpresionIdentificador(Instruccion) :
 
     def __init__(self, identificador, fila, columna):

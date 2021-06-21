@@ -1,3 +1,5 @@
+# aqui estan todos los tipos de datos que se pueden usar dentro del compilador
+
 from enum import Enum
 
 class TIPO(Enum):
