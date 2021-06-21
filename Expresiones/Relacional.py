@@ -11,7 +11,9 @@ class Relacional(Instruccion):
         self.fila = fila
         self.columna = columna
         self.tipo = TIPO.BOOLEANO
-
+        # verifica las instrucciones de cada operador
+        #el . interprete sirve para que ejecute las instrucciones que se adecuen al tipo de operacion
+        
     
     def interpretar(self, tree, table):
         izq = self.OperacionIzq.interpretar(tree, table)
@@ -21,6 +23,7 @@ class Relacional(Instruccion):
             if isinstance(der, Excepcion): return der
 
 
+        # aqui se verifica el tipo de operaciones relacionales que se realizar 
         if self.operador == OperadorRelacional.MAYORQUE:
             # OPERACION SOLO DE ENTEROS
             if self.OperacionIzq.tipo == TIPO.ENTERO and self.OperacionDer.tipo == TIPO.ENTERO:

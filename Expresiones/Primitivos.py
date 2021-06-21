@@ -4,7 +4,7 @@ from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
 
 
-
+# solo devuelve el valor del id
 class Primitivos(Instruccion):
     def __init__(self, tipo, valor, fila, columna):
         self.tipo = tipo

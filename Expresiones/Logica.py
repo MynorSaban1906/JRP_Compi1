@@ -12,7 +12,9 @@ class Logica(Instruccion):
         self.columna = columna
         self.tipo = TIPO.BOOLEANO
 
-    
+    # operaciones logicas 
+    # se inerpretan cada instruccion segun el operador en este caso es el simbolo 
+    # lo cual debe de generar una respuesta booleana
     def interpretar(self, tree, table):
         izq = self.OperacionIzq.interpretar(tree, table)
         if isinstance(izq, Excepcion): return izq

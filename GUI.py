@@ -1,3 +1,12 @@
+"""
+    Universidad de san carlos de Guatemala
+    Mynor Alison Isai Saban Che 201800516
+    Codigo ayuda  de Jose Puac auxiliar de compiladores 1 vaciones 2021 primer semestre
+"""
+
+
+
+
 
 from tkinter import *            # ventana
 from tkinter import Menu            # barra de tareas
@@ -29,6 +38,7 @@ reservadas = {
     'default',
     'main',
     'func',
+    'null'
 
 }
 
@@ -59,7 +69,8 @@ class GUI:
         self.file_item.add_command(label='Abrir archivos', command=self.abrirFile)
         self.file_item.add_command(label='Guardar', command=self.guardar)
         self.file_item.add_command(label='Guardar como', command=self.guardarcomo)
- 
+        self.file_item.add_command(label='abrir', command=self.ayuda)
+
         self.herramienta_item = Menu(self.menu,tearoff=0)    # SUB MENU HERRAMIENTAS
         self.herramienta_item.add_command(label='Interpretar',command=self.analizar)
         self.herramienta_item.add_command(label='Debugger')
@@ -97,7 +108,15 @@ class GUI:
 
         self.window.mainloop()
 
-
+    def ayuda(self):
+        self.nameFile=fd.askopenfilename(title = "Seleccione archivo",filetypes = (("jpr files","*.jpr"),("All Files","*.*")))
+        if self.nameFile!="":
+            archi1=open(self.nameFile, "r", encoding="utf-8")
+            contenido=archi1.read()
+            archi1.close()
+            self.Entrada.delete("1.0", END)
+            self.Entrada.insert("1.0", contenido)
+            self.Consola.delete("1.0","end") 
 
     # Dispara el Filechooser
     def abrirFile(self):
@@ -241,7 +260,21 @@ class GUI:
             
             #estado de cadena con comilla doble
             elif caracter== '"': 
-                while(True):
+                if re.match(r'[a-zA-Z][a-zA-Z0-9_]*',palabra):
+                    id=[]
+                    id.append("variable")
+                    id.append(palabra)
+                    lista.append(id)
+                    palabra=''
+
+                elif re.match(r'(\d+\.\d+|\d+)',palabra):
+                    num=[]
+                    num.append("numero")
+                    num.append(palabra)
+                    lista.append(num)
+                    palabra=''
+                    
+                while(contador < len(texto)):
                     caracter=texto[contador]
                     palabra+=caracter
                     if re.match(r'\"(\\"|.)*?\"',palabra):
@@ -252,8 +285,25 @@ class GUI:
                         palabra=''
                         break
                     contador+=1
+
+                    
+                        
             # estado de cadena con comilla simple                        
             elif caracter=="'":
+                if re.match(r'[a-zA-Z][a-zA-Z0-9_]*',palabra):
+                    id=[]
+                    id.append("variable")
+                    id.append(palabra)
+                    lista.append(id)
+                    palabra=''
+
+                elif re.match(r'(\d+\.\d+|\d+)',palabra):
+                    num=[]
+                    num.append("numero")
+                    num.append(palabra)
+                    lista.append(num)
+                    palabra=''
+
                 copia=contador
                 verifi=0
                 while(True):
@@ -281,7 +331,21 @@ class GUI:
             
             # estado de comentarios
             elif caracter=='#':
+                if re.match(r'[a-zA-Z][a-zA-Z0-9_]*',palabra):
+                    id=[]
+                    id.append("variable")
+                    id.append(palabra)
+                    lista.append(id)
+                    palabra=''
+
+                elif re.match(r'(\d+\.\d+|\d+)',palabra):
+                    num=[]
+                    num.append("numero")
+                    num.append(palabra)
+                    lista.append(num)
+                    palabra=''
                 palabra +=caracter
+                
                 if texto[contador+1]!='*':
                     while(caracter!="\n"):
                         contador+=1

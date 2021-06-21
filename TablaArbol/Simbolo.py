@@ -1,3 +1,6 @@
+
+# este es el objeto  de tipo simbolo
+
 class Simbolo:
     
     def __init__(self, identificador, tipo, fila, columna, valor ):
