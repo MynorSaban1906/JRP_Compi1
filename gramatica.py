@@ -13,6 +13,7 @@ from Instrucciones.Main import Main
 from Instrucciones.Switch import Switch
 from Instrucciones.While import While
 from Instrucciones.Case import Case
+from Instrucciones.FuncionSimple import FuncionSimple
 
 
 from Expresiones.Aritmetica import Aritmetica
@@ -477,9 +478,11 @@ def p_main(t) :
     t[0] = Main(t[5], t.lineno(1), find_column(input, t.slice[1]))
 
 
+#/////////////////////////////////////// Funciones sin parametros //////////////////////////////////////////////////
 
-
-
+def p_funcionSimple(t):
+    'funcion_instr  : RFUNC ID PARIZQ PARDER LLAIZQ instrucciones LLADER'
+    t[0] = FuncionSimple(t[2],t[6], t.lineno(1), find_column(input, t.slice[1]))
 
 
 
