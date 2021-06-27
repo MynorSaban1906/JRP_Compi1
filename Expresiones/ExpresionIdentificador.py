@@ -27,3 +27,10 @@ class ExpresionIdentificador(Instruccion) :
 
     def setIdentificador(self, identificador):
         self.identificador=identificador
+
+        
+    def getTipo(self):
+        return self.tipo
+
+    def setTipo(self, tipo):
+        self.tipo=tipo

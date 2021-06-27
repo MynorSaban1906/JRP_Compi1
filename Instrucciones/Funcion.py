@@ -3,14 +3,13 @@ from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
-import Instrucciones.Return
 from TablaArbol.Tipo import TIPO
 from Instrucciones.Return import Return
 
 
 class Funcion(Instruccion):
     def __init__(self, identificador,parametros, instrucciones, fila, columna):
-        self.identificador = identificador
+        self.identificador = identificador.lower()
         self.parametros =parametros
         self.instrucciones = instrucciones
         self.fila = fila

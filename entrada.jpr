@@ -1,10 +1,12 @@
 main(){
-  print("vamos a probar las funciones ")
-  print(suma(500,100))
-  print("la suma es : "+suma(500+100))
-  
+    for (var i =0; i > -1; i++) {
+      if (i==5){
+        break
+      }
+      print(i)
+    }
   }
-
+var contadorA = 0;
 
 funC factorial(int numeroFactorial){
   while (numeroFactorial > -1) {
@@ -33,4 +35,11 @@ funC hola(){
 
 funC suma(int a, int b){
   return a+b;
+}
+
+func Prueb(string mayuscula, string minuscula){
+  var m1=toUpper(mayuscula)
+  var m2=toLoWer(minuscula)
+  print("desde funcion "+ m1)
+  print("desde funcion "+m2)
 }

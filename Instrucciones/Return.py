@@ -1,5 +1,3 @@
-from TablaArbol.ts import TablaSimbolos
-from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
@@ -17,9 +15,12 @@ class Return(Instruccion):
     def interpretar(self, tree, table):
         result = self.expresion.interpretar(tree, table)
         if isinstance(result, Excepcion): return result
-
-        self.setTipo(self.getExpresion().getTipo())#TIPO DEL RESULT
-        self.setNodo(result )          #VALOR DEL RESULT
+        # obtiene el tipo de dato que trae la funcion y lo guarda el return para igualarlo a una variable o retornarla
+        # se obtiene de la sig: opera la expresiones y obtiene el resultado y luego lo devuelve
+        #pero en este caso se obtiene el tipo de dato que tiene la expresion 
+        #y se iguala al tipo de dato del return
+        self.setTipo(self.getExpresion().getTipo())
+        self.setNodo(result )          # aqui se devuelve el valor en si, lo que se quiere devolver da la funcion o ciclo
 
         return self
 

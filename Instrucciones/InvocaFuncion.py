@@ -17,15 +17,15 @@ class InvocaFuncion(Instruccion):
         
     def interpretar(self, tree, table):
         #se obtiene la funcion , este esta en el arbol que nunca se cambia simpre es el mismo
-        funcion = tree.getFuncion(self.identificador)
+        funcion = tree.getFuncion(self.identificador.lower())
         if funcion==None: # si no encontro la funcion entonces  genera un errro
             return Excepcion("Semantico", "No se encontro la funcion "+ self.identificador, self.fila, self.columna)
-        nuevaTabla=TablaSimbolos(table)
+        nuevaTabla=TablaSimbolos(tree.getTablaSimboloGlobal())
         # obtener los parametros 
         if len(funcion.getParametros())==len(self.getParametros()): # si trae los msmos parametros que la funcion 
             contador=0
             for expresion in self.getParametros(): # se obtiene el valor del parametro en la llamada
-                resultadoExpresion=expresion.interpretar(tree,nuevaTabla)
+                resultadoExpresion=expresion.interpretar(tree,table)
 
                 if isinstance(resultadoExpresion,Excepcion): return resultadoExpresion
 

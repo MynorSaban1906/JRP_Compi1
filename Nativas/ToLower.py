@@ -2,7 +2,7 @@ from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
 
-class ToUpper(Funcion):
+class ToLower(Funcion):
     def __init__(self, nombre,parametros,instrucciones,fila, columna):
         self.identificador = nombre
         self.fila = fila
@@ -12,18 +12,18 @@ class ToUpper(Funcion):
         self.tipo = TIPO.NULO
 
     def interpretar(self, tree, table):
-        simbolo = table.getTabla("toupper##param1") # crea una variable con el nombre complicado, algo que nunca vendra
+        simbolo = table.getTabla("tolower##param1") # crea una variable con el nombre complicado, algo que nunca vendra
 
         if simbolo ==None:
-            return Excepcion("Semantico", "No se encontro el parametro de ToUpper ", self.getFila(),self.getColumna())
+            return Excepcion("Semantico", "No se encontro el parametro de ToLower ", self.getFila(),self.getColumna())
 
         if simbolo.getTipo() != TIPO.CADENA: # si no es igual al tipo cadena entraria en un error
-            return Excepcion("Semantico", "No se puede usar ToUpper  en  Tipo " +simbolo.getTipo() , self.getFila(),self.getColumna())
+            return Excepcion("Semantico", "No se puede usar ToLower  en  Tipo " +simbolo.getTipo() , self.getFila(),self.getColumna())
 
 
         self.setTipo(simbolo.getTipo()) # se pasa el tipo de dato el cual siempre seria tipo cadena
         
-        return simbolo.getValor().upper() # se devuelve el valor en solo mayusculas
+        return simbolo.getValor().lower() # se devuelve el valor en solo mayusculas
 
 
 

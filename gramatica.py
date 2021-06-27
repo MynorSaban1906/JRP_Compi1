@@ -1,4 +1,6 @@
 #se importan las clases necesarias 
+from Instrucciones.Continue import Continue
+from Nativas.ToLower import ToLower
 import re
 
 from Instrucciones.Asignacion import Asignacion
@@ -54,6 +56,7 @@ reservadas = {
     'default'   : 'DEFAULT',
     'main'      : 'RMAIN',
     'func'      : 'RFUNC',
+    'continue'  : 'RCONTINUE'
 
 }
 
@@ -416,6 +419,10 @@ def p_break(t) :
     t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
 
 
+def p_continue(t) :
+    'continue_instr     : RCONTINUE'
+    t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
+
 
 #///////////////////////////////////////WHILE//////////////////////////////////////////////////
 
@@ -582,8 +589,16 @@ def crearNativas(ast):
     nombre = "toUpper"
     parametros = [{'tipo':TIPO.CADENA,'identificador':'toUpper##Param1'}]
     instrucciones = []
-    toUpper = ToUpper(nombre, parametros, instrucciones, -1, -1)
+    toUpper = ToUpper(nombre.lower(), parametros, instrucciones, -1, -1)
     ast.addFuncion(toUpper)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
+
+
+    nombre = "toLower"
+    parametros = [{'tipo':TIPO.CADENA,'identificador':'toLower##Param1'}]
+    toLower = ToLower(nombre.lower(), parametros, instrucciones, -1, -1)
+    ast.addFuncion(toLower)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
+
+
 
 
 def getErrores():
@@ -642,10 +657,13 @@ for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
             Arbol_ast.getExcepciones().append(value)
             Arbol_ast.updateConsola(value.toString())
         if isinstance(value, Break): 
-            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+            err = Excepcion("Semantico", "Sentencia BREAK fuera de un ciclo", instruccion.fila, instruccion.columna)
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
-
+        if isinstance(value, Return): 
+            err = Excepcion("Semantico", "Sentencia RETURN fuera de un ciclo", instruccion.fila, instruccion.columna)
+            Arbol_ast.getExcepciones().append(err)
+            Arbol_ast.updateConsola(err.toString())
 
 
 
