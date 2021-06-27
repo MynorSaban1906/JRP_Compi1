@@ -13,8 +13,9 @@ from Instrucciones.Main import Main
 from Instrucciones.Switch import Switch
 from Instrucciones.While import While
 from Instrucciones.Case import Case
-from Instrucciones.FuncionSimple import FuncionSimple
-
+from Instrucciones.Funcion import Funcion
+from Instrucciones.InvocaFuncion import InvocaFuncion
+from Instrucciones.Return import Return
 
 from Expresiones.Aritmetica import Aritmetica
 from Expresiones.ExpresionIdentificador import ExpresionIdentificador
@@ -25,6 +26,7 @@ from TablaArbol.Tipo import TIPO,OperadorAritmetico,OperadorLogico,OperadorRelac
 from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Arbol import Arbol
 from TablaArbol.ts import TablaSimbolos
+from Nativas.ToUpper import ToUpper
 
 
 errores = []
@@ -34,7 +36,12 @@ reservadas = {
     'print' : 'PRINT',
     'var' : 'VAR',
     'null':'NULO',
-
+    'int'       : 'RINT',
+    'double'     : 'RDOUBLE',
+    'string'    : 'RSTRING',
+    'boolean'   : 'RBOOLEAN',
+    'return'    : 'RRETURN',
+    
     'if'        : 'RIF',
     'else'      : 'RELSE', 
     'true'      : 'RTRUE',
@@ -79,7 +86,8 @@ tokens  = [
     'ID',
     'AUMENTO',
     'DECRECI',
-    'DPUNTOS'
+    'DPUNTOS',
+    'COMA'
 
 
 
@@ -110,6 +118,7 @@ t_NOT =r'!'
 t_AUMENTO= '\+\+'
 t_DECRECI='--'
 t_DPUNTOS=':'
+t_COMA=','
 
 def t_DECIMAL(t):
     r'\d+\.\d+'
@@ -227,6 +236,9 @@ def p_instruccion(t) :
                         |   for_instr
                         |   switch_instr
                         |   main_instr
+                        |   funcion_instr 
+                        |   llamadaFuncion final
+                        |   return_instr final
     '''
     t[0] = t[1]
 
@@ -356,7 +368,9 @@ def p_expresion_id(t):
     'expresion : ID'
     t[0] = ExpresionIdentificador(t[1], t.lineno(1), find_column(input, t.slice[1]))
 
-
+def p_expresion_llamada(t):
+    'expresion : llamadaFuncion '
+    t[0] = t[1]
 
 #////////////////////////////////DEFINIR VARIABLE ////////////////////////
 
@@ -451,6 +465,7 @@ def p_lista_casos(t) :
     if t[2] != "":
         t[1].append(t[2])
     t[0] = t[1]
+
     
 def p_lista_casos_caso(t) :
     'cases_lista    : case'
@@ -480,20 +495,99 @@ def p_main(t) :
 
 #/////////////////////////////////////// Funciones sin parametros //////////////////////////////////////////////////
 
-def p_funcionSimple(t):
-    'funcion_instr  : RFUNC ID PARIZQ PARDER LLAIZQ instrucciones LLADER'
-    t[0] = FuncionSimple(t[2],t[6], t.lineno(1), find_column(input, t.slice[1]))
+def p_FuncionParametros(t):
+    'funcion_instr  : RFUNC ID PARIZQ parametros PARDER LLAIZQ instrucciones LLADER'
+    t[0] = Funcion(t[2],t[4],t[7], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_FuncionSinParametros(t):
+    'funcion_instr  : RFUNC ID PARIZQ  PARDER LLAIZQ instrucciones LLADER'
+    t[0] = Funcion(t[2],[],t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+#///////////////////////////////////////PARAMETROS//////////////////////////////////////////////////
+
+def p_parametros_1(t) :
+    'parametros     : parametros COMA parametro'
+    t[1].append(t[3])
+    t[0] = t[1]
+    
+def p_parametros_2(t) :
+    'parametros    : parametro'
+    t[0] = [t[1]]
+
+#///////////////////////////////////////PARAMETRO//////////////////////////////////////////////////
+
+def p_parametro(t) :
+    'parametro     : tipo ID'
+    t[0] = {'tipo':t[1],'identificador':t[2]}
 
 
+#///////////////////////////////////////TIPO//////////////////////////////////////////////////
+
+def p_tipo(t) :
+    '''tipo     : RINT
+                | RDOUBLE
+                | RSTRING
+                | RBOOLEAN '''
+    if t[1].lower() == 'int':
+        t[0] = TIPO.ENTERO
+    elif t[1].lower() == 'double':
+        t[0] = TIPO.DECIMAL
+    elif t[1].lower() == 'string':
+        t[0] = TIPO.CADENA
+    elif t[1].lower() == 'boolean':
+        t[0] = TIPO.BOOLEANO
+
+
+    
+
+#///////////////////////////////////////llamada de  Funciones sin parametros //////////////////////////////////////////////////
+
+def p_llamadaFuncion(t):
+    'llamadaFuncion  : ID PARIZQ PARDER '
+    t[0] = InvocaFuncion(t[1], [],t.lineno(2), find_column(input, t.slice[2]))
+
+
+def p_llamadaFuncionParametro (t):
+    'llamadaFuncion  : ID PARIZQ parametros_llamada PARDER '
+    t[0] = InvocaFuncion(t[1], t[3],t.lineno(2), find_column(input, t.slice[2]))
+
+#///////////////////////////////////////PARAMETROS LLAMADA A FUNCION//////////////////////////////////////////////////
+
+def p_parametrosLL_1(t) :
+    'parametros_llamada     : parametros_llamada COMA parametro_llamada'
+    t[1].append(t[3])
+    t[0] = t[1]
+    
+def p_parametrosLL_2(t) :
+    'parametros_llamada    : parametro_llamada'
+    t[0] = [t[1]]
+
+#///////////////////////////////////////PARAMETRO LLAMADA A FUNCION//////////////////////////////////////////////////
+
+def p_parametroLL(t) :
+    'parametro_llamada     : expresion'
+    t[0] = t[1]
+
+def p_retorno(t) :
+    'return_instr     : RRETURN expresion'
+    t[0] = Return(t[2],t.lineno(1), find_column(input, t.slice[1]))
 
 
 import ply.yacc as yacc
+
 parser = yacc.yacc()
 input = ''
 
+def crearNativas(ast):
+    nombre = "toUpper"
+    parametros = [{'tipo':TIPO.CADENA,'identificador':'toUpper##Param1'}]
+    instrucciones = []
+    toUpper = ToUpper(nombre, parametros, instrucciones, -1, -1)
+    ast.addFuncion(toUpper)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
+
 
 def getErrores():
-    return errores
+    return errores 
 
 def parse(inp) :
     global errores
@@ -507,10 +601,68 @@ def parse(inp) :
 
 #INTERFAZ
 
+archivo=open("entrada.jpr","r")
+entrada=archivo.read()
+
+instrucciones = parse(entrada) #ARBOL AST
+Arbol_ast = Arbol(instrucciones)
+TablaSimboloGlobal = TablaSimbolos()
+Arbol_ast.setTablaSimboloGlobal(TablaSimboloGlobal)
+crearNativas(Arbol_ast)
+for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
+    Arbol_ast.getExcepciones().append(error)
+    Arbol_ast.updateConsola(error.toString())
+
+
+for instruccion in Arbol_ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
+    if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion):
+        value = instruccion.interpretar(Arbol_ast,TablaSimboloGlobal)
+        if isinstance(value, Excepcion) :
+            Arbol_ast.getExcepciones().append(value)
+            Arbol_ast.updateConsola(value.toString())
+        if isinstance(value, Break): 
+            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+            Arbol_ast.getExcepciones().append(err)
+            Arbol_ast.updateConsola(err.toString())
+    if isinstance(instruccion,Funcion):
+        Arbol_ast.addFuncion(instruccion)
+        
+for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
+    contador = 0
+
+    if isinstance(instruccion, Main):
+        contador += 1
+        if contador == 2: # VERIFICAR LA DUPLICIDAD
+            err = Excepcion("Semantico", "Existen 2 funciones Main", instruccion.fila, instruccion.columna)
+            Arbol_ast.getExcepciones().append(err)
+            Arbol_ast.updateConsola(err.toString())
+            break
+        value = instruccion.interpretar(Arbol_ast,TablaSimboloGlobal)
+        if isinstance(value, Excepcion) :
+            Arbol_ast.getExcepciones().append(value)
+            Arbol_ast.updateConsola(value.toString())
+        if isinstance(value, Break): 
+            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+            Arbol_ast.getExcepciones().append(err)
+            Arbol_ast.updateConsola(err.toString())
 
 
 
 
+for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
+    if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)
+            or isinstance(instruccion, Funcion)):
+        err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
+        Arbol_ast.getExcepciones().append(err)
+        Arbol_ast.updateConsola(err.toString())
+
+
+
+print(Arbol_ast.getConsola())
+
+
+
+'''
 def analizador(entrada):
     instrucciones = parse(entrada) #ARBOL AST
     Arbol_ast = Arbol(instrucciones)
@@ -557,12 +709,10 @@ def analizador(entrada):
             Arbol_ast.updateConsola(err.toString())
 
 
-    for err in Arbol_ast.getExcepciones():
-        errores.append(err)
-    print(Arbol_ast.getConsola())  
+
     return Arbol_ast.getConsola()
 
 def listaErrores():
     return errores
-    
+'''
     

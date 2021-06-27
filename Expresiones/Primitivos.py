@@ -15,3 +15,27 @@ class Primitivos(Instruccion):
     def interpretar(self, tree, table):
         return self.valor
 
+    def getTipo(self):
+        return self.tipo
+
+    def setTipo(self, tipo):
+        self.tipo=tipo
+
+    def getValor(self):
+        return self.valor
+
+    def setValor(self, valor):
+        self.valor = valor
+
+        
+    def getFila(self):
+        return self.fila
+
+    def setFila(self, fila):
+        self.fila= fila 
+
+    def getColumna(self):
+        return self.columna
+
+    def setColumna(self, columna):
+        self.columna= columna

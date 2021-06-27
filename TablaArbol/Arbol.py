@@ -37,9 +37,9 @@ class Arbol:
     def getFunciones(self):
         return self.funciones
 
-    def getFuncion(self, nombre):
+    def getFuncion(self, identificador):
         for funcion in self.funciones:
-            if funcion.nombre == nombre:
+            if funcion.getIdentificador() == identificador:
                 return funcion
         return None
     

@@ -5,6 +5,7 @@ from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
+from Instrucciones.Return import Return
 
 
 
@@ -30,6 +31,7 @@ class If(Instruccion):
                         tree.getExcepciones().append(result)
                         tree.updateConsola(result.toString())
                     if isinstance(result, Break): return result
+                    if isinstance(result, Return): return result
             else:               #ELSE
                 if self.instruccionesElse != None:
                     nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
@@ -39,10 +41,12 @@ class If(Instruccion):
                             tree.getExcepciones().append(result)
                             tree.updateConsola(result.toString()) 
                         if isinstance(result, Break): return result
+                        if isinstance(result, Return): return result
                 elif self.elseIf != None:
                     result = self.elseIf.interpretar(tree, table)
                     if isinstance(result, Excepcion): return result
                     if isinstance(result, Break): return result
+                    if isinstance(result, Return): return result
 
         else:
             return Excepcion("Semantico", "Tipo de dato no booleano en IF.", self.fila, self.columna)

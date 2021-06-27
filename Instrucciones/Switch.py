@@ -5,7 +5,7 @@ from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
-
+from Instrucciones.Return import Return
 class Switch(Instruccion):
     def __init__(self, expresion,listaInstrucciones,default, fila, columna):
         self.expresion = expresion # valor que se encuentra dentro del switch
@@ -34,6 +34,7 @@ class Switch(Instruccion):
                             if isinstance(InstruccionesCase, Excepcion) :
                                 tree.getExcepciones().append(InstruccionesCase)
                                 tree.updateConsola(InstruccionesCase.toString())
+                            if isinstance(InstruccionesCase, Return): return InstruccionesCase
                             if isinstance(InstruccionesCase, Break): 
                                 bandera=True 
                                 return None
@@ -47,6 +48,7 @@ class Switch(Instruccion):
                                 tree.getExcepciones().append(InstruccionesCase)
                                 tree.updateConsola(InstruccionesCase.toString())
                             if isinstance(InstruccionesCase, Break): return None
+                            if isinstance(InstruccionesCase, Return): return InstruccionesCase
 
                 
                 if self.default!=None:

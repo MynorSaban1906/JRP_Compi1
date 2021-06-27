@@ -20,9 +20,9 @@ class Inc_Dec(Instruccion):
         if isinstance(value, Excepcion): return value
         
         if self.tipo==OperadorAritmetico.AUMENTO:
-            simbolo= Simbolo(self.identificador,self.expresion.tipo,self.fila,self.columna,value + 1)
+            simbolo= Simbolo(self.identificador.lower(),self.expresion.tipo,self.fila,self.columna,value + 1)
         elif self.tipo==OperadorAritmetico.DECREMENTO:
-            simbolo= Simbolo(self.identificador,self.expresion.tipo,self.fila,self.columna,value - 1)
+            simbolo= Simbolo(self.identificador.lower(),self.expresion.tipo,self.fila,self.columna,value - 1)
 
         else:
             return Excepcion("Semantico", "error en caracter de incremento o decremento ", self.fila, self.columna)

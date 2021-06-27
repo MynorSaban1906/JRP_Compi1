@@ -245,3 +245,20 @@ class Aritmetica(Instruccion):
             return bool(val)
         return str(val)
         
+    def getFila(self):
+        return self.fila
+
+    def setFila(self, fila):
+        self.fila= fila 
+
+    def getColumna(self):
+        return self.columna
+
+    def setColumna(self, columna):
+        self.columna= columna
+ 
+    def getTipo(self):
+        return self.tipo
+
+    def setTipo(self, tipo):
+        self.tipo=tipo

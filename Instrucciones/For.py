@@ -5,6 +5,7 @@ from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
+from Instrucciones.Return import Return
 
 class For(Instruccion):
     def __init__(self, inicial,condicion,paso,instrucciones, fila, columna):
@@ -34,6 +35,7 @@ class For(Instruccion):
                             tree.updateConsola(result.toString())
 
                         if isinstance(result, Break): return None
+                        if isinstance(result, Return): return result
 
                     #aumenta la variable para la siguiente iteracion
                     paso= self.paso.interpretar(tree,nuevaTabla2)
