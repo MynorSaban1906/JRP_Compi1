@@ -1,4 +1,8 @@
 #se importan las clases necesarias 
+from Nativas.Round import Round
+from Nativas.Typeof import Typeof
+from Expresiones.Read import Read
+from Nativas.Truncate import Truncate
 from Instrucciones.Continue import Continue
 from Nativas.ToLower import ToLower
 import re
@@ -29,6 +33,7 @@ from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Arbol import Arbol
 from TablaArbol.ts import TablaSimbolos
 from Nativas.ToUpper import ToUpper
+from Nativas.Length import Length
 
 
 errores = []
@@ -56,7 +61,8 @@ reservadas = {
     'default'   : 'DEFAULT',
     'main'      : 'RMAIN',
     'func'      : 'RFUNC',
-    'continue'  : 'RCONTINUE'
+    'continue'  : 'RCONTINUE',
+    'read'      : 'RREAD'
 
 }
 
@@ -122,6 +128,7 @@ t_AUMENTO= '\+\+'
 t_DECRECI='--'
 t_DPUNTOS=':'
 t_COMA=','
+
 
 def t_DECIMAL(t):
     r'\d+\.\d+'
@@ -242,6 +249,7 @@ def p_instruccion(t) :
                         |   funcion_instr 
                         |   llamadaFuncion final
                         |   return_instr final
+                        |   continue_instr final
     '''
     t[0] = t[1]
 
@@ -331,6 +339,13 @@ def p_expresion_agrupacion(t):
 def p_expresion_entero(t):
     'expresion : ENTERO'
     t[0] = Primitivos(TIPO.ENTERO,t[1], t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_expresion_read(t):
+    'expresion : RREAD PARIZQ PARDER'
+    t[0] = Read(t.lineno(1), find_column(input, t.slice[1]))
+
+
 
 def p_primitivo_decimal(t):
     'expresion : DECIMAL'
@@ -592,13 +607,30 @@ def crearNativas(ast):
     toUpper = ToUpper(nombre.lower(), parametros, instrucciones, -1, -1)
     ast.addFuncion(toUpper)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
 
-
     nombre = "toLower"
     parametros = [{'tipo':TIPO.CADENA,'identificador':'toLower##Param1'}]
     toLower = ToLower(nombre.lower(), parametros, instrucciones, -1, -1)
     ast.addFuncion(toLower)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
 
+    nombre = "Truncate"
+    parametros = [{'tipo':TIPO.NULO,'identificador':'truncate##param1'}]
+    truncado = Truncate(nombre.lower(), parametros, instrucciones, -1, -1)
+    ast.addFuncion(truncado)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
 
+    nombre = "Typeof"
+    parametros = [{'tipo':TIPO.NULO,'identificador':'typeof##param1'}]
+    typeof = Typeof(nombre.lower(), parametros, instrucciones, -1, -1)
+    ast.addFuncion(typeof)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
+
+    nombre = "round"
+    parametros = [{'tipo':TIPO.ENTERO,'identificador':'round##param1'}]
+    round = Round(nombre.lower(), parametros, instrucciones, -1, -1)
+    ast.addFuncion(round)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
+
+    nombre = "length"
+    parametros = [{'tipo':TIPO.NULO,'identificador':'length##param1'}]
+    length = Length(nombre.lower(), parametros, instrucciones, -1, -1)
+    ast.addFuncion(length)     # GUARDAR LA FUNCION EN "MEMORIA" (EN EL ARBOL)
 
 
 def getErrores():
@@ -662,6 +694,10 @@ for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
             Arbol_ast.updateConsola(err.toString())
         if isinstance(value, Return): 
             err = Excepcion("Semantico", "Sentencia RETURN fuera de un ciclo", instruccion.fila, instruccion.columna)
+            Arbol_ast.getExcepciones().append(err)
+            Arbol_ast.updateConsola(err.toString())
+        if isinstance(value, Continue): 
+            err = Excepcion("Semantico", "Sentencia Continue fuera de un ciclo", instruccion.fila, instruccion.columna)
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
 

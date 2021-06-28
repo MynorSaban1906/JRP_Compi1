@@ -1,11 +1,17 @@
 main(){
-    for (var i =0; i > -1; i++) {
-      if (i==5){
-        break
-      }
-      print(i)
-    }
+  var x =1.5
+  var y = round(x)
+  print("valor decimal "+x)
+  print("valor redondeado "+y)
+  print("Tipo de dato del valor inicial : "+typeof(x))
+  print("Tipo de dato del valor redondeado : "+typeof(y))
+  var cade= "holahee"
+  var h=leNGTh(cade)
+  print(h)
   }
+
+
+  
 var contadorA = 0;
 
 funC factorial(int numeroFactorial){
@@ -38,8 +44,9 @@ funC suma(int a, int b){
 }
 
 func Prueb(string mayuscula, string minuscula){
-  var m1=toUpper(mayuscula)
-  var m2=toLoWer(minuscula)
-  print("desde funcion "+ m1)
-  print("desde funcion "+m2)
+  var m1=toUpper(mayuscula,minuscula);
+  var m2=toLoWer(minuscula);
+  print("desde funcion "+ m1);
+  print("desde funcion "+m2);
+
 }

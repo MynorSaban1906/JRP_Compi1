@@ -2,9 +2,9 @@ from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
-from Instrucciones.Break import Break
-from Instrucciones.Funcion import Funcion
-from Instrucciones.Return import  Return
+
+
+FNativas =['toUpper##Param1','toLower##Param1','truncate##param1']
 
 class InvocaFuncion(Instruccion):
     def __init__(self, nombre,parametros,fila, columna):
@@ -30,16 +30,24 @@ class InvocaFuncion(Instruccion):
                 if isinstance(resultadoExpresion,Excepcion): return resultadoExpresion
 
                 # se debe validar que sean del mismo tipo, los parametrso de la llamada con los parametros de la funcion
-                if funcion.parametros[contador]['tipo']== expresion.getTipo():
+                if funcion.parametros[contador]['identificador'] in ('truncate##param1','typeof##param1','round##param1','length##param1'):
+                    funcion.parametros[contador]['tipo']=expresion.getTipo()
                     #creacion de simbolo e ingresandolo a la tabla de simbolo
                     simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'], self.getFila(), self.getColumna(),resultadoExpresion)
                     result=nuevaTabla.setTabla(simbolo)
                     if isinstance(result,Excepcion): return result
-
-
-                else:
-                    return Excepcion("Semantico", "Tipo Diferente en los parametros de llamada ", self.getFila(), self.getColumna())
                 
+                else:
+                    if funcion.parametros[contador]['tipo']== expresion.getTipo():
+                        #creacion de simbolo e ingresandolo a la tabla de simbolo
+                        simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'], self.getFila(), self.getColumna(),resultadoExpresion)
+                        result=nuevaTabla.setTabla(simbolo)
+                        if isinstance(result,Excepcion): return result
+
+                    
+                    else:
+                        return Excepcion("Semantico", "Tipo Diferente en los parametros de llamada ", self.getFila(), self.getColumna())
+                    
                 contador+=1 # para ir paralelamente en los parametros
 
 

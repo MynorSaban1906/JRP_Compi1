@@ -1,16 +1,18 @@
 from Instrucciones.Instruccion import Instruccion
-
+from TablaArbol.Tipo  import TIPO
 
 # solo devuelve el valor del id
-class Primitivos(Instruccion):
-    def __init__(self, tipo, valor, fila, columna):
-        self.tipo = tipo
-        self.valor = valor
+class Read(Instruccion):
+    def __init__(self, fila, columna):
+        self.tipo = TIPO.CADENA
         self.fila = fila
         self.columna = columna
 
     def interpretar(self, tree, table):
-        return self.valor
+        print(tree.getConsola()) # imprime lo que ya estaba en la consola 
+        tree.setConsola("")     # resetea la consola pero esto es una prueba en visual
+        lectura = input("Ingreso a un READ. Ingrese el valor : ") # obtiene el valor que se ingresa pero este solo es en string
+        return lectura 
 
     def getTipo(self):
         return self.tipo
@@ -18,13 +20,6 @@ class Primitivos(Instruccion):
     def setTipo(self, tipo):
         self.tipo=tipo
 
-    def getValor(self):
-        return self.valor
-
-    def setValor(self, valor):
-        self.valor = valor
-
-        
     def getFila(self):
         return self.fila
 

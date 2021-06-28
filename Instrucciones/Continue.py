@@ -7,4 +7,4 @@ class Continue(Instruccion):
         self.columna = columna
 
     def interpretar(self, tree, table):
-        break
+        return self

@@ -2,7 +2,8 @@ from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
 
-class ToLower(Funcion):
+
+class Typeof(Funcion):
     def __init__(self, nombre,parametros,instrucciones,fila, columna):
         self.identificador = nombre
         self.fila = fila
@@ -12,18 +13,17 @@ class ToLower(Funcion):
         self.tipo = TIPO.NULO
 
     def interpretar(self, tree, table):
-        simbolo = table.getTabla("tolower##param1") # crea una variable con el nombre complicado, algo que nunca vendra
-
-        if simbolo ==None:
-            return Excepcion("Semantico", "No se encontro el parametro de ToLower ", self.getFila(),self.getColumna())
-
-        if simbolo.getTipo() != TIPO.CADENA: # si no es igual al tipo cadena entraria en un error
-            return Excepcion("Semantico", "No se puede usar ToLower  en  Tipo " +simbolo.getTipo() , self.getFila(),self.getColumna())
-    
-
-        self.setTipo(simbolo.getTipo()) # se pasa el tipo de dato el cual siempre seria tipo cadena
+        simbolo = table.getTabla("typeof##param1") # crea una variable con el nombre complicado, algo que nunca vendra
         
-        return simbolo.getValor().lower() # se devuelve el valor en solo mayusculas
+        if simbolo ==None:
+            return Excepcion("Semantico", "No se encontro el parametro de TypeOf ", self.getFila(),self.getColumna())
+
+        self.setTipo(TIPO.CADENA) # se pasa el tipo de dato el cual siempre seria tipo cadena
+        
+        if simbolo.getTipo().name =='ARREGLO': # por si viene un tipo arreglo buscaria el tipo del arreglo
+            pass
+    
+        return str(simbolo.getTipo().name) # se devuelve el valor ya tuncado por la funcion math.trunc 
 
 
 

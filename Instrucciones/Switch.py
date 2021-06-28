@@ -37,7 +37,7 @@ class Switch(Instruccion):
                             if isinstance(InstruccionesCase, Return): return InstruccionesCase
                             if isinstance(InstruccionesCase, Break): 
                                 bandera=True 
-                                return None
+                                return InstruccionesCase
                             bandera=False # SI EL CASE NO TIENE BREAK SIGUE EVALUANDO LOS DEMAS CASOS
                     elif bandera==False and (self.default==None or str(expresioncase)==str(expresion)):
                         tablaCase1 = TablaSimbolos(table)
@@ -47,7 +47,7 @@ class Switch(Instruccion):
                             if isinstance(InstruccionesCase, Excepcion) :
                                 tree.getExcepciones().append(InstruccionesCase)
                                 tree.updateConsola(InstruccionesCase.toString())
-                            if isinstance(InstruccionesCase, Break): return None
+                            if isinstance(InstruccionesCase, Break): return InstruccionesCase
                             if isinstance(InstruccionesCase, Return): return InstruccionesCase
 
                 
@@ -59,7 +59,8 @@ class Switch(Instruccion):
                         if isinstance(Instrucciones, Excepcion) :
                             tree.getExcepciones().append(Instrucciones)
                             tree.updateConsola(Instrucciones.toString())
-                        if isinstance(Instrucciones, Break):  return None
+                        if isinstance(Instrucciones, Break):  return Instrucciones
+                        if isinstance(Instrucciones, Return): return Instrucciones
                     else:
                         break
                 else:

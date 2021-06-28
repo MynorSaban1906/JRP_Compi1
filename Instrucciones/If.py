@@ -1,3 +1,4 @@
+from Instrucciones.Continue import Continue
 from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Tipo import OperadorAritmetico,TIPO
 from abc import ABC, abstractmethod
@@ -32,6 +33,7 @@ class If(Instruccion):
                         tree.updateConsola(result.toString())
                     if isinstance(result, Break): return result
                     if isinstance(result, Return): return result
+                    if isinstance(result, Continue): return result
             else:               #ELSE
                 if self.instruccionesElse != None:
                     nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO

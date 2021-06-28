@@ -11,3 +11,10 @@ GRAMATICA2
 primero
 Reporte.html
 pruebas
+__pycache__
+pruebas
+parser.out
+parsetab
+entrada.txt
+entrada.jpr
+.gitignore

@@ -1,8 +1,10 @@
+
 from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
+import math
 
-class ToLower(Funcion):
+class Round(Funcion):
     def __init__(self, nombre,parametros,instrucciones,fila, columna):
         self.identificador = nombre
         self.fila = fila
@@ -12,18 +14,18 @@ class ToLower(Funcion):
         self.tipo = TIPO.NULO
 
     def interpretar(self, tree, table):
-        simbolo = table.getTabla("tolower##param1") # crea una variable con el nombre complicado, algo que nunca vendra
-
-        if simbolo ==None:
-            return Excepcion("Semantico", "No se encontro el parametro de ToLower ", self.getFila(),self.getColumna())
-
-        if simbolo.getTipo() != TIPO.CADENA: # si no es igual al tipo cadena entraria en un error
-            return Excepcion("Semantico", "No se puede usar ToLower  en  Tipo " +simbolo.getTipo() , self.getFila(),self.getColumna())
-    
-
-        self.setTipo(simbolo.getTipo()) # se pasa el tipo de dato el cual siempre seria tipo cadena
+        simbolo = table.getTabla("round##param1") # crea una variable con el nombre complicado, algo que nunca vendra
         
-        return simbolo.getValor().lower() # se devuelve el valor en solo mayusculas
+        if simbolo ==None:
+            return Excepcion("Semantico", "No se encontro el parametro de la funcion Round ", self.getFila(),self.getColumna())
+
+        if simbolo.getTipo() not in(TIPO.ENTERO, TIPO.DECIMAL): # si no es igual al tipo entero o decimal este entraria en un error
+            return Excepcion("Semantico", "No se puede usar la funcion Round  "  , simbolo.getFila(),simbolo.getColumna())
+
+
+        self.setTipo(TIPO.ENTERO) # se pasa el tipo de dato el cual siempre seria tipo entero
+        
+        return round(simbolo.getValor())# se devuelve el valor ya redondeado "lista para imprimir" 
 
 
 
