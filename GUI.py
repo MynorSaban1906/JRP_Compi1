@@ -11,7 +11,6 @@
 from tkinter import *            # ventana
 from tkinter import Menu            # barra de tareas
 from tkinter import scrolledtext    # textarea
-from tkinter import messagebox      # message box
 from tkinter import filedialog as fd # filechooser
 from tkinter import messagebox as mb
 from tkinter import Canvas,Frame
@@ -38,10 +37,24 @@ reservadas = {
     'default',
     'main',
     'func',
-    'null'
+    'null',
+    'int',
+    'double',
+    'boolean',
+    'read',
+    'return',
+    'break',
+    'continue',
+    'char',
+    'string',
+    'tolower',
+    'toupper',
+    'length',
+    'truncate',
+    'round',
+    'typeof'
 
 }
-
 
 class GUI:
  # Metodo que contiene la definicion de la interfaz grafica 
@@ -49,7 +62,6 @@ class GUI:
    
     def __init__(self):
         self.window = Tk()
-        
         self.nameFile=""
         self.Entrada = Entry(self.window,width=10)
         self.Consola = Entry(self.window,width=10)
@@ -108,6 +120,8 @@ class GUI:
 
         self.window.mainloop()
 
+
+
     def ayuda(self):
         self.nameFile=fd.askopenfilename(title = "Seleccione archivo",filetypes = (("jpr files","*.jpr"),("All Files","*.*")))
         if self.nameFile!="":
@@ -160,6 +174,8 @@ class GUI:
         scanner= analizador(entrada)
         self.Consola.insert("1.0",scanner)        
 
+    def IngresaConsola(self,texto):
+        self.Consola.insert(texto)      
 
     def reporte1(self):
         contador=1
@@ -491,6 +507,9 @@ class TextoLinea(tk.Canvas):
             linenum = str(i).split(".")[0]
             self.create_text(2, y, anchor="nw", text=linenum, fill="#606366")
             i = self.textwidget.index("%s+1line" % i)
+
+
+
 
 
 start = GUI()

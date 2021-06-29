@@ -1,4 +1,5 @@
 #se importan las clases necesarias 
+from Instrucciones.Casteos import Casteos
 from Nativas.Round import Round
 from Nativas.Typeof import Typeof
 from Expresiones.Read import Read
@@ -62,7 +63,8 @@ reservadas = {
     'main'      : 'RMAIN',
     'func'      : 'RFUNC',
     'continue'  : 'RCONTINUE',
-    'read'      : 'RREAD'
+    'read'      : 'RREAD',
+    'char'      : 'RCHAR'
 
 }
 
@@ -380,6 +382,10 @@ def p_primitivo_false(t):
     '''expresion : RFALSE'''
     t[0] = Primitivos(TIPO.BOOLEANO, False, t.lineno(1), find_column(input, t.slice[1]))
 
+def p_casteos(t):
+    '''expresion : PARIZQ tipo PARDER expresion'''
+    t[0] = Casteos(t[2],t[4], t.lineno(1), find_column(input, t.slice[1]))
+
 
 
 def p_expresion_id(t):
@@ -549,7 +555,8 @@ def p_tipo(t) :
     '''tipo     : RINT
                 | RDOUBLE
                 | RSTRING
-                | RBOOLEAN '''
+                | RBOOLEAN 
+                | RCHAR'''
     if t[1].lower() == 'int':
         t[0] = TIPO.ENTERO
     elif t[1].lower() == 'double':
@@ -558,6 +565,8 @@ def p_tipo(t) :
         t[0] = TIPO.CADENA
     elif t[1].lower() == 'boolean':
         t[0] = TIPO.BOOLEANO
+    elif t[1].lower() == 'char':
+        t[0] = TIPO.CHARACTER
 
 
     
@@ -668,7 +677,7 @@ for instruccion in Arbol_ast.getInstrucciones():      # 1ERA PASADA (DECLARACION
             Arbol_ast.getExcepciones().append(value)
             Arbol_ast.updateConsola(value.toString())
         if isinstance(value, Break): 
-            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+            err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo 1", instruccion.fila, instruccion.columna)
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
     if isinstance(instruccion,Funcion):
@@ -689,7 +698,7 @@ for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
             Arbol_ast.getExcepciones().append(value)
             Arbol_ast.updateConsola(value.toString())
         if isinstance(value, Break): 
-            err = Excepcion("Semantico", "Sentencia BREAK fuera de un ciclo", instruccion.fila, instruccion.columna)
+            err = Excepcion("Semantico", "Sentencia BREAK fuera de un ciclo 2", instruccion.fila, instruccion.columna)
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
         if isinstance(value, Return): 
@@ -718,10 +727,12 @@ print(Arbol_ast.getConsola())
 
 '''
 def analizador(entrada):
+
     instrucciones = parse(entrada) #ARBOL AST
     Arbol_ast = Arbol(instrucciones)
     TablaSimboloGlobal = TablaSimbolos()
     Arbol_ast.setTablaSimboloGlobal(TablaSimboloGlobal)
+    crearNativas(Arbol_ast)
     for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
         Arbol_ast.getExcepciones().append(error)
         Arbol_ast.updateConsola(error.toString())
@@ -734,12 +745,15 @@ def analizador(entrada):
                 Arbol_ast.getExcepciones().append(value)
                 Arbol_ast.updateConsola(value.toString())
             if isinstance(value, Break): 
-                err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+                err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo 1", instruccion.fila, instruccion.columna)
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
+        if isinstance(instruccion,Funcion):
+            Arbol_ast.addFuncion(instruccion)
             
     for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
         contador = 0
+
         if isinstance(instruccion, Main):
             contador += 1
             if contador == 2: # VERIFICAR LA DUPLICIDAD
@@ -752,21 +766,29 @@ def analizador(entrada):
                 Arbol_ast.getExcepciones().append(value)
                 Arbol_ast.updateConsola(value.toString())
             if isinstance(value, Break): 
-                err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
+                err = Excepcion("Semantico", "Sentencia BREAK fuera de un ciclo 2", instruccion.fila, instruccion.columna)
+                Arbol_ast.getExcepciones().append(err)
+                Arbol_ast.updateConsola(err.toString())
+            if isinstance(value, Return): 
+                err = Excepcion("Semantico", "Sentencia RETURN fuera de un ciclo", instruccion.fila, instruccion.columna)
+                Arbol_ast.getExcepciones().append(err)
+                Arbol_ast.updateConsola(err.toString())
+            if isinstance(value, Continue): 
+                err = Excepcion("Semantico", "Sentencia Continue fuera de un ciclo", instruccion.fila, instruccion.columna)
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
 
+
+
     for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
-        if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)):
+        if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)
+                or isinstance(instruccion, Funcion)):
             err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
-
-
-
+            
     return Arbol_ast.getConsola()
-
 def listaErrores():
     return errores
-'''
-    
+
+    '''

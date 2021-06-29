@@ -35,9 +35,9 @@ class For(Instruccion):
                             tree.getExcepciones().append(result)
                             tree.updateConsola(result.toString())
 
-                        if isinstance(result, Break): return result
+                        if isinstance(result, Break): return None
                         if isinstance(result, Return): return result
-                        if isinstance(result, Continue): break
+                        if isinstance(result, Continue): return None
 
                     #aumenta la variable para la siguiente iteracion
                     paso= self.paso.interpretar(tree,nuevaTabla2)

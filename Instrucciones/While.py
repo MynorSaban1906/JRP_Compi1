@@ -32,7 +32,7 @@ class While(Instruccion):
                         if isinstance(result, Excepcion) :
                             tree.getExcepciones().append(result)
                             tree.updateConsola(result.toString())
-                        if isinstance(result, Break): return result
+                        if isinstance(result, Break): return None
                         if isinstance(result, Return): return result
                         if isinstance(result, Continue): break
                 else:

@@ -1,14 +1,10 @@
 main(){
-  var x =1.5
-  var y = round(x)
-  print("valor decimal "+x)
-  print("valor redondeado "+y)
-  print("Tipo de dato del valor inicial : "+typeof(x))
-  print("Tipo de dato del valor redondeado : "+typeof(y))
-  var cade= "holahee"
-  var h=leNGTh(cade)
-  print(h)
-  }
+
+  print("prueba")
+  var a= read()
+  print(a)
+  print("osi sali osi")
+}
 
 
   

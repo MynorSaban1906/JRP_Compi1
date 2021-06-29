@@ -1,8 +1,6 @@
 from Instrucciones.Continue import Continue
 from TablaArbol.Excepcion import Excepcion
-from TablaArbol.Tipo import OperadorAritmetico,TIPO
-from abc import ABC, abstractmethod
-from TablaArbol.Simbolo import Simbolo
+from TablaArbol.Tipo import TIPO
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
@@ -31,9 +29,9 @@ class If(Instruccion):
                     if isinstance(result, Excepcion) :
                         tree.getExcepciones().append(result)
                         tree.updateConsola(result.toString())
-                    if isinstance(result, Break): return result
                     if isinstance(result, Return): return result
                     if isinstance(result, Continue): return result
+                    if isinstance(result, Break): return result
             else:               #ELSE
                 if self.instruccionesElse != None:
                     nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
@@ -42,13 +40,15 @@ class If(Instruccion):
                         if isinstance(result, Excepcion) :
                             tree.getExcepciones().append(result)
                             tree.updateConsola(result.toString()) 
-                        if isinstance(result, Break): return result
                         if isinstance(result, Return): return result
+                        if isinstance(result, Break): return result
+                        if isinstance(result, Continue): return result
                 elif self.elseIf != None:
                     result = self.elseIf.interpretar(tree, table)
                     if isinstance(result, Excepcion): return result
-                    if isinstance(result, Break): return result
                     if isinstance(result, Return): return result
+                    if isinstance(result, Break): return result
+                    if isinstance(result, Continue): return result
 
         else:
             return Excepcion("Semantico", "Tipo de dato no booleano en IF.", self.fila, self.columna)
