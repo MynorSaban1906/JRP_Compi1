@@ -1,8 +1,8 @@
 
+from tkinter.constants import END
 from Instrucciones.Instruccion import Instruccion
 from TablaArbol.Tipo  import TIPO
 from tkinter import simpledialog
-from GUI import start
 
 # aqui se obtiene la ventana donde se ejecula todo el 
 # solo devuelve el valor del id
@@ -12,13 +12,15 @@ class Read(Instruccion):
         self.tipo = TIPO.CADENA
         self.fila = fila
         self.columna = columna
-
+        self.tama=1
     def interpretar(self, tree, table):
         # para el read lo unico es usar un cuadro de dialogo que abra y listo se genera el read
         # lo unico es que no se valida si solo se da un aceptar ** esto ees igual a una cadena vacia ""***
-        start.IngresaConsola("hohoho")
-        return simpledialog.askstring("Funcion Read","Ingresa tu texto")
+        
+        tree.getConsolaGUI().delete(1.0, END)
+        tree.getConsolaGUI().insert("1.0",tree.getConsola())
 
+        return simpledialog.askstring("Funcion Read","Ingresa tu texto")
 
     def getTipo(self):
         return self.tipo

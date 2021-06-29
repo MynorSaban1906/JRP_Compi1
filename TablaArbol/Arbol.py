@@ -1,3 +1,6 @@
+from tkinter.constants import NONE
+
+
 class Arbol:
     def __init__(self, instrucciones ):
         self.instrucciones = instrucciones # son de tipo instrucciones
@@ -5,6 +8,13 @@ class Arbol:
         self.funciones=[]   # para las funcioes
         self.consola = ""
         self.TablaSimboloGlobal = None # al inicial inicia en NOne
+        self.ConsolaGUI = None
+
+    def getConsolaGUI(self):
+        return self.ConsolaGUI
+    
+    def setConsolaGUI(self, consola):
+        self.ConsolaGUI=consola
 
     def getInstrucciones(self):
         return self.instrucciones

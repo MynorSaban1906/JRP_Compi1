@@ -656,7 +656,7 @@ def parse(inp) :
     return parser.parse(inp)
 
 #INTERFAZ
-
+''''
 archivo=open("entrada.jpr","r")
 entrada=archivo.read()
 
@@ -726,12 +726,13 @@ print(Arbol_ast.getConsola())
 
 
 '''
-def analizador(entrada):
 
+def analizador(entrada,consola):
     instrucciones = parse(entrada) #ARBOL AST
     Arbol_ast = Arbol(instrucciones)
     TablaSimboloGlobal = TablaSimbolos()
     Arbol_ast.setTablaSimboloGlobal(TablaSimboloGlobal)
+    Arbol_ast.setConsolaGUI(consola)
     crearNativas(Arbol_ast)
     for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
         Arbol_ast.getExcepciones().append(error)
@@ -791,4 +792,3 @@ def analizador(entrada):
 def listaErrores():
     return errores
 
-    '''

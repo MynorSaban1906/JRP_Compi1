@@ -1,9 +1,13 @@
 main(){
 
-  print("prueba")
+  print("prueba 1 read")
   var a= read()
   print(a)
-  print("osi sali osi")
+  print("sale sin problemas")
+  print("prueba2 read")
+  var a1= read()
+  print(a1)
+  print("fin ")
 }
 
 

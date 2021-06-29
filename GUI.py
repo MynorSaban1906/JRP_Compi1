@@ -170,9 +170,13 @@ class GUI:
 
     def analizar(self):
         self.Consola.delete(1.0, END)
+
         entrada= self.Entrada.get("1.0",END) # FILA 1 COLUMNA 0
-        scanner= analizador(entrada)
+        scanner= analizador(entrada,self.Consola)
+        self.Consola.delete(1.0, END)
         self.Consola.insert("1.0",scanner)        
+
+
 
     def IngresaConsola(self,texto):
         self.Consola.insert(texto)      
