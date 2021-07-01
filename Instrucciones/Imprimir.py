@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
+from TablaArbol.NodoAST import NodoAST
 
 class Imprimir(Instruccion):
     def __init__(self, expresion, fila, columna):
@@ -26,3 +27,22 @@ class Imprimir(Instruccion):
 
         tree.updateConsola(value)
 
+    def getNodo(self):
+        nodo=NodoAST("IMPRIMIR")
+        nodo.Agregar_Hijo_Nodo(str(self.expresion.getNodo()))
+        
+        return nodo
+
+
+    def getFila(self):
+        return self.fila
+
+    def setFila(self, fila):
+        self.fila= fila 
+
+    def getColumna(self):
+        return self.columna
+
+    def setColumna(self, columna):
+        self.columna= columna
+        

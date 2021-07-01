@@ -3,6 +3,7 @@ from tkinter.constants import END
 from Instrucciones.Instruccion import Instruccion
 from TablaArbol.Tipo  import TIPO
 from tkinter import simpledialog
+from TablaArbol.NodoAST import NodoAST
 
 # aqui se obtiene la ventana donde se ejecula todo el 
 # solo devuelve el valor del id
@@ -40,3 +41,9 @@ class Read(Instruccion):
     def setColumna(self, columna):
         self.columna= columna
 
+
+
+    def getNodo(self):
+        nodo=NodoAST("READ")
+        return nodo
+        

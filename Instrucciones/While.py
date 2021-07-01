@@ -7,6 +7,7 @@ from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
 from Instrucciones.Return import Return
+from TablaArbol.NodoAST import NodoAST
 
 
 
@@ -39,3 +40,14 @@ class While(Instruccion):
                     break
             else:
                 return Excepcion("Semantico", "Tipo de dato no booleano en while.", self.fila, self.columna)
+
+    def getNodo(self):
+        nodo=NodoAST("WHILE")
+
+        instrucciones=NodoAST("INSTRUCCIONES")
+        for instr in self.instrucciones:
+            instrucciones.Agregar_Hijo_Nodo(instr.getNodo())
+
+        nodo.Agregar_Hijo_Nodo(instrucciones)
+        
+        return nodo

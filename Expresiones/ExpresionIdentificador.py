@@ -1,6 +1,7 @@
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
+from TablaArbol.NodoAST import NodoAST
 
 
 # identifica que que tipo y obtiene el valor de ella 
@@ -22,6 +23,15 @@ class ExpresionIdentificador(Instruccion) :
         self.tipo = simbolo.getTipo()
         
         return simbolo.getValor()
+
+
+    def getNodo(self):
+        nodo=NodoAST("IDENTIFICICADOR")
+        nodo.Agregar_Nodo_Hijo(str(self.getIdentificador()))
+        return nodo
+        
+
+
     def getIdentificador(self):
         return self.identificador
 

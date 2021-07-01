@@ -2,6 +2,7 @@ from TablaArbol.Tipo import TIPO,OperadorLogico
 from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
 from TablaArbol.Tipo import TIPO
+from TablaArbol.NodoAST import NodoAST
 
 class Casteos(Instruccion):
     def __init__(self, tipo, expresion, fila, columna):
@@ -105,6 +106,13 @@ class Casteos(Instruccion):
         return str(val)
 
 
+    def getNodo(self):
+        nodo=NodoAST("PRIMITIVO")
+        nodo.Agregar_Hijo(str(self.getTipo()))
+        nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
+        return nodo
+        
+
     def getTipo(self):
         return self.tipo
 
@@ -114,8 +122,14 @@ class Casteos(Instruccion):
     def getExpresion(self):
         return self.expresion
 
+    def setExpresion(self,expresion):
+        self.expresion= expresion
+
     def setValor(self, expresion):
         self.expresion=expresion
+
+    def getValor(self):
+        return self.expresion
 
     def getFila(self):
         return self.fila

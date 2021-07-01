@@ -98,7 +98,9 @@ tokens  = [
     'AUMENTO',
     'DECRECI',
     'DPUNTOS',
-    'COMA'
+    'COMA',
+    'CORIZQ',
+    'CORDER'
 
 
 
@@ -130,6 +132,8 @@ t_AUMENTO= '\+\+'
 t_DECRECI='--'
 t_DPUNTOS=':'
 t_COMA=','
+t_CORDER='\]'
+t_CORIZQ='\['
 
 
 def t_DECIMAL(t):
@@ -252,6 +256,7 @@ def p_instruccion(t) :
                         |   llamadaFuncion final
                         |   return_instr final
                         |   continue_instr final
+                        |   arreglo1_instr final
     '''
     t[0] = t[1]
 
@@ -547,6 +552,11 @@ def p_parametros_2(t) :
 def p_parametro(t) :
     'parametro     : tipo ID'
     t[0] = {'tipo':t[1],'identificador':t[2]}
+
+
+def p_declaraArreglo(t) :
+    'arreglo_instr    : RMAIN PARIZQ PARDER LLAIZQ instrucciones LLADER'
+    t[0] = Main(t[5], t.lineno(1), find_column(input, t.slice[1]))
 
 
 #///////////////////////////////////////TIPO//////////////////////////////////////////////////

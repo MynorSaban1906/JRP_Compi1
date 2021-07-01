@@ -5,6 +5,7 @@ from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
 from TablaArbol.Tipo import TIPO
 from Instrucciones.Return import Return
+from TablaArbol.NodoAST import NodoAST
 
 
 class Funcion(Instruccion):
@@ -35,6 +36,24 @@ class Funcion(Instruccion):
         return None # por defecto
 
 
+    def getNodo(self):
+        nodo=NodoAST("FUNCION")
+        nodo.Agregar_Hijo(str(self.getIdentificador()))
+        parametros =NodoAST("PARAMETROS")
+        for param in self.getParametros():
+            parametro= NodoAST("PARAMETRO")
+            parametro.Agregar_Hijo(param["tipo"])
+            parametro.Agregar_Hijo(param["identificador"])
+            parametros.Agregar_Hijo_Nodo(parametro)
+        nodo.Agregar_Hijo_Nodo(parametros)
+
+        instrucciones=NodoAST("INSTRUCCIONES")
+        for instr in self.instrucciones:
+            instrucciones.Agregar_Hijo_Nodo(instr.getNodo())
+
+        nodo.Agregar_Hijo_Nodo(instrucciones)
+        
+        return nodo
 
     def getIdentificador(self):
         return self.identificador

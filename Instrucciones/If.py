@@ -5,6 +5,7 @@ from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
 from Instrucciones.Return import Return
+from TablaArbol.NodoAST import NodoAST
 
 
 
@@ -53,3 +54,21 @@ class If(Instruccion):
         else:
             return Excepcion("Semantico", "Tipo de dato no booleano en IF.", self.fila, self.columna)
 
+    def getNodo(self):
+        nodo=NodoAST("INSTRUCCIONES IF")
+
+        instruccionesIf=NodoAST("INSTRUCCIONES")
+        for instr in self.instruccionesIf:
+            instruccionesIf.Agregar_Hijo_Nodo(instr.getNodo())
+        nodo.Agregar_Hijo_Nodo(instruccionesIf)
+
+        if self.instruccionesElse != None:
+            instruccionesElse=NodoAST("INSTRUCCIONES ELSE")
+            for instr in self.instruccionesIf:
+                instruccionesElse.Agregar_Hijo_Nodo(instr.getNodo())
+            nodo.Agregar_Hijo_Nodo(instruccionesElse)
+
+        elif self.elseIf != None:
+            nodo.Agregar_Hijo_Nodo(self.elseIf.getNodo())
+        
+        return nodo

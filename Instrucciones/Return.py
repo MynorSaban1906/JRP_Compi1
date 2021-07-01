@@ -3,6 +3,7 @@ from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
 
 
+from TablaArbol.NodoAST import NodoAST
 class Return(Instruccion):
     
     def __init__(self, expresion, fila, columna):
@@ -23,6 +24,13 @@ class Return(Instruccion):
         self.setNodo(result )          # aqui se devuelve el valor en si, lo que se quiere devolver da la funcion o ciclo
 
         return self
+
+
+    def getNodo(self):
+        nodo=NodoAST("BREAK")
+        nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
+        return nodo
+
 
     def getExpresion(self):
         return self.expresion

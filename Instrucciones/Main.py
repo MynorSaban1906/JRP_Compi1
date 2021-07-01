@@ -5,6 +5,7 @@ from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
+from TablaArbol.NodoAST import NodoAST
 
 
 class Main(Instruccion):
@@ -26,3 +27,13 @@ class Main(Instruccion):
                 tree.updateConsola(err.toString())
 
 
+    def getNodo(self):
+        nodo=NodoAST("MAIN")
+
+        instrucciones=NodoAST("INSTRUCCIONES")
+        for instr in self.instrucciones:
+            instrucciones.Agregar_Hijo_Nodo(instr.getNodo())
+
+        nodo.Agregar_Hijo_Nodo(instrucciones)
+        
+        return nodo

@@ -1,4 +1,5 @@
 from Instrucciones.Instruccion import Instruccion
+from TablaArbol.NodoAST import NodoAST
 
 
 class Continue(Instruccion):
@@ -8,3 +9,7 @@ class Continue(Instruccion):
 
     def interpretar(self, tree, table):
         return self
+
+    def getNodo(self):
+        nodo=NodoAST("CONTINUE")
+        return nodo

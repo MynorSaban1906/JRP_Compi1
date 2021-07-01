@@ -3,7 +3,7 @@ from TablaArbol.Tipo import TIPO,OperadorAritmetico
 from Expresiones.ExpresionIdentificador import ExpresionIdentificador
 from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
-
+from TablaArbol.NodoAST import NodoAST
 
 class Aritmetica(Instruccion):
     def __init__(self, operador, OperacionIzq, OperacionDer, fila, columna):
@@ -245,6 +245,20 @@ class Aritmetica(Instruccion):
             return bool(val)
         return str(val)
         
+
+    def getNodo(self):
+        nodo= NodoAST("ARITMETICA")  
+        if self.OperacionDer != None:
+            nodo.Agregar_Hijo_Nodo(self.OperacionIzq.getNodo())
+            nodo.Agregar_Hijo(str(self.operador))
+            nodo.Agregar_Hijo_Nodo(self.OperacionDer.getNodo())
+        else:
+            nodo.Agregar_Hijo(str(self.operador))
+            nodo.Agregar_Hijo_Nodo(self.OperacionIzq.getNodo())
+            
+        return nodo
+
+
     def getFila(self):
         return self.fila
 

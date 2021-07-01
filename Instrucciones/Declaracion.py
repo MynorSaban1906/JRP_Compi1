@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
+from TablaArbol.NodoAST import NodoAST
 
 
 class Declaracion(Instruccion):
@@ -25,3 +26,43 @@ class Declaracion(Instruccion):
         if isinstance(result, Excepcion): return result
         self.tipo=simbolo.getTipo()  # AUN ESTA EN PRUEBA
         return None
+
+
+    def getNodo(self):
+        nodo=NodoAST("DECLARACION")
+        nodo.Agregar_Hijo(str(self.getIdentificador()))
+        if self.getExpresion!=None:
+            nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
+        return nodo
+        
+
+    def getIdentificador(self):
+        return self.identificador
+
+    def setIdentificador(self, identificador):
+        self.identificador=identificador
+
+        
+    def getTipo(self):
+        return self.tipo
+
+    def setTipo(self, tipo):
+        self.tipo=tipo
+
+    def getExpresion(self):
+        return self.expresion
+
+    def setExpresion(self,expresion):
+        self.expresion= expresion
+
+    def getFila(self):
+        return self.fila
+
+    def setFila(self, fila):
+        self.fila= fila 
+
+    def getColumna(self):
+        return self.columna
+
+    def setColumna(self, columna):
+        self.columna= columna

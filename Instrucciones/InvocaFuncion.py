@@ -2,6 +2,7 @@ from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
+from TablaArbol.NodoAST import NodoAST
 
 
 FNativas =['toUpper##Param1','toLower##Param1','truncate##param1']
@@ -63,6 +64,22 @@ class InvocaFuncion(Instruccion):
         else :
 
             return Excepcion("Semantico", "Cantidad de parametros para la funcion \""+self.getIdentificador() + "\" NO VALIDO ", self.getFila(), self.getColumna())
+
+
+
+    def getNodo(self):
+        nodo=NodoAST("LLAMADA A FUNCION")
+        nodo.Agregar_Hijo(str(self.getIdentificador()))
+        parametros =NodoAST("PARAMETROS")
+        for param in self.getParametros():
+            parametro= NodoAST("PARAMETRO")
+            parametros.Agregar_Hijo_Nodo(param.getNodo())
+        nodo.Agregar_Hijo_Nodo(parametros)
+
+        nodo.Agregar_Hijo_Nodo(instrucciones)
+        
+        return nodo
+
 
 
     def getIdentificador(self):
