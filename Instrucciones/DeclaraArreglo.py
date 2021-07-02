@@ -27,7 +27,7 @@ class DeclaraArreglo(Instruccion):
         # CREACION DEL ARREGLO
         ArregloDimension = self.crearDimensiones(tree, table, copy.copy(self.expresiones))     #RETORNA EL ARREGLO DE DIMENSIONES
         if isinstance(ArregloDimension, Excepcion): return ArregloDimension
-        simbolo = Simbolo(str(self.getIdentificador()).lower(), self.getTipo1(), self.getArreglo(), self.getFila(), self.getColumna() ArregloDimension)
+        simbolo = Simbolo(str(self.getIdentificador()).lower(), self.getTipo1(), self.getArreglo(), self.getFila(), self.getColumna() ,ArregloDimension)
         result = table.setTabla(simbolo)
         if isinstance(result, Excepcion): return result
         return None
