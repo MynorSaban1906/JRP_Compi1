@@ -1,5 +1,6 @@
 #se importan las clases necesarias 
 import os
+import sys
 from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Casteos import Casteos
 from Nativas.Round import Round
@@ -9,6 +10,7 @@ from Nativas.Truncate import Truncate
 from Instrucciones.Continue import Continue
 from Nativas.ToLower import ToLower
 import re
+from Instrucciones.DeclaraArreglo import DeclaraArreglo
 
 from Instrucciones.Asignacion import Asignacion
 from Instrucciones.Break import Break
@@ -66,7 +68,8 @@ reservadas = {
     'func'      : 'RFUNC',
     'continue'  : 'RCONTINUE',
     'read'      : 'RREAD',
-    'char'      : 'RCHAR'
+    'char'      : 'RCHAR',
+    'new'       : 'RNEW'
 
 }
 
@@ -137,7 +140,7 @@ t_COMA=','
 t_CORDER='\]'
 t_CORIZQ='\['
 
-
+ 
 def t_DECIMAL(t):
     r'\d+\.\d+'
     try:
@@ -258,6 +261,7 @@ def p_instruccion(t) :
                         |   llamadaFuncion final
                         |   return_instr final
                         |   continue_instr final
+                        |   definicionArreglo_instr final
     '''
     t[0] = t[1]
 
@@ -611,7 +615,44 @@ def p_retorno(t) :
     t[0] = Return(t[2],t.lineno(1), find_column(input, t.slice[1]))
 
 
+
+# ...................   DECLARACION DE ARREGLOS ...............
+'''
+def p_declaraArreglo(t) :
+    definicionArreglo_instr     : tipo1
+    t[0] = t[1]
+
+'''
+
+
+def p_tipo1(t):
+    '''definicionArreglo_instr     : tipo lista_Dimension ID IGUAL RNEW tipo lista_expresiones'''
+    t[0] = DeclaraArreglo(t[1], t[2], t[3], t[6], t[7], t.lineno(3), find_column(input, t.slice[3]))
+
+def p_lista_Dim1(t) :
+    'lista_Dimension     : lista_Dimension CORIZQ  CORDER'
+    t[0] = t[1] + 1
+    
+def p_lista_Dim2(t) :
+    'lista_Dimension    : CORIZQ  CORDER'
+    t[0] = 1
+
+def p_lista_expresiones_1(t) :
+    'lista_expresiones     : lista_expresiones CORIZQ expresion CORDER'
+    t[1].append(t[3])
+    t[0] = t[1]
+    
+def p_lista_expresiones_2(t) :
+    'lista_expresiones    : CORIZQ expresion CORDER'
+    t[0] = [t[2]]
+
+
+
+
+
 import ply.yacc as yacc
+
+sys.setrecursionlimit(3000)
 
 parser = yacc.yacc()
 input = ''

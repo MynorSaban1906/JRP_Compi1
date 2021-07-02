@@ -5,8 +5,6 @@ from Instrucciones.Instruccion import Instruccion
 from TablaArbol.NodoAST import NodoAST
 
 
-FNativas =['toUpper##Param1','toLower##Param1','truncate##param1']
-
 class InvocaFuncion(Instruccion):
     def __init__(self, nombre,parametros,fila, columna):
         self.identificador = nombre
