@@ -1,52 +1,12 @@
 main(){
 
-  print("prueba 1 read")
+  print("prueba 1 de funcion READ")
   var a= read()
-  print(a)
-  print("sale sin problemas")
-  print("prueba2 read")
+  print("Imprime la cadena que se ingreso : "+a)
+  print("\n")
+  print("prueba 2 de funcion READ")
   var a1= read()
-  print(a1)
+  print("Imprime la cadena que se ingreso : "+a1)
   print("fin ")
 }
 
-
-  
-var contadorA = 0;
-
-funC factorial(int numeroFactorial){
-  while (numeroFactorial > -1) {
-      var fact = 1;
-      var cadena1 = "El factorial de: " + numeroFactorial + " = ";
-      if (numeroFactorial =! 0) {
-        for (var i = numeroFactorial; i > 0; i--) {
-          fact = fact * i;
-          cadena1 = cadena1 + i;
-          if (i > 1) {
-            cadena1 = cadena1 + " * ";
-          } else {
-            cadena1 = cadena1 + " = ";
-          }
-        }
-      }
-      cadena1 = cadena1 + fact;
-      print(cadena1);
-      numeroFactorial--;
-  }
-}
-
-funC hola(){
-  print("holi osi ganaremos")
-}
-
-funC suma(int a, int b){
-  return a+b;
-}
-
-func Prueb(string mayuscula, string minuscula){
-  var m1=toUpper(mayuscula,minuscula);
-  var m2=toLoWer(minuscula);
-  print("desde funcion "+ m1);
-  print("desde funcion "+m2);
-
-}

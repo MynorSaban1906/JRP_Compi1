@@ -1,4 +1,5 @@
 
+from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
@@ -28,6 +29,11 @@ class Truncate(Funcion):
         
         return math.trunc(simbolo.getValor())# se devuelve el valor ya tuncado por la funcion math.trunc 
 
+    def getNodo(self):
+        nodo=NodoAST("TRUNCATE")
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+
+        return nodo
 
 
     def getIdentificador(self):

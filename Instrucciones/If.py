@@ -55,16 +55,16 @@ class If(Instruccion):
             return Excepcion("Semantico", "Tipo de dato no booleano en IF.", self.fila, self.columna)
 
     def getNodo(self):
-        nodo=NodoAST("INSTRUCCIONES IF")
+        nodo=NodoAST("IF")
 
-        instruccionesIf=NodoAST("INSTRUCCIONES")
+        instruccionesIf=NodoAST("INSTRUCCIONES IF")
         for instr in self.instruccionesIf:
             instruccionesIf.Agregar_Hijo_Nodo(instr.getNodo())
         nodo.Agregar_Hijo_Nodo(instruccionesIf)
 
         if self.instruccionesElse != None:
             instruccionesElse=NodoAST("INSTRUCCIONES ELSE")
-            for instr in self.instruccionesIf:
+            for instr in self.instruccionesElse:
                 instruccionesElse.Agregar_Hijo_Nodo(instr.getNodo())
             nodo.Agregar_Hijo_Nodo(instruccionesElse)
 

@@ -51,10 +51,19 @@ class Logica(Instruccion):
         nodo= NodoAST("LOGICA")  
         if self.OperacionDer != None:
             nodo.Agregar_Hijo_Nodo(self.OperacionIzq.getNodo())
-            nodo.Agregar_Hijo(str(self.operador))
+            nodo.Agregar_Hijo(self.simb(self.operador.name))
             nodo.Agregar_Hijo_Nodo(self.OperacionDer.getNodo())
         else:
-            nodo.Agregar_Hijo(str(self.operador))
+            nodo.Agregar_Hijo(self.simb(self.operador.name))
             nodo.Agregar_Hijo_Nodo(self.OperacionIzq.getNodo())
             
+            
         return nodo
+
+    def simb(self, operador):
+        if operador=="NOT":
+            return "!"
+        elif operador=="AND":
+            return "&&"
+        elif operador=="OR":
+            return "||"

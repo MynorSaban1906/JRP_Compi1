@@ -1,4 +1,6 @@
 #se importan las clases necesarias 
+import os
+from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Casteos import Casteos
 from Nativas.Round import Round
 from Nativas.Typeof import Typeof
@@ -256,7 +258,6 @@ def p_instruccion(t) :
                         |   llamadaFuncion final
                         |   return_instr final
                         |   continue_instr final
-                        |   arreglo1_instr final
     '''
     t[0] = t[1]
 
@@ -554,10 +555,6 @@ def p_parametro(t) :
     t[0] = {'tipo':t[1],'identificador':t[2]}
 
 
-def p_declaraArreglo(t) :
-    'arreglo_instr    : RMAIN PARIZQ PARDER LLAIZQ instrucciones LLADER'
-    t[0] = Main(t[5], t.lineno(1), find_column(input, t.slice[1]))
-
 
 #///////////////////////////////////////TIPO//////////////////////////////////////////////////
 
@@ -781,7 +778,7 @@ def analizador(entrada,consola):
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
             if isinstance(value, Return): 
-                err = Excepcion("Semantico", "Sentencia RETURN fuera de un ciclo", instruccion.fila, instruccion.columna)
+                err = Excepcion("Semantico", "Sentencia RETURN fuera de una funcion", instruccion.fila, instruccion.columna)
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
             if isinstance(value, Continue): 
@@ -798,6 +795,24 @@ def analizador(entrada,consola):
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
             
+
+    init = NodoAST("RAIZ")
+    instr = NodoAST("INSTRUCCIONES")
+
+    for instruccion in Arbol_ast.getInstrucciones():
+        instr.Agregar_Hijo_Nodo(instruccion.getNodo())
+
+    init.Agregar_Hijo_Nodo(instr)
+    grafo = Arbol_ast.getDot(init) #DEVUELVE EL CODIGO GRAPHVIZ DEL AST
+
+    dirname = os.path.dirname(__file__)
+    direcc = os.path.join(dirname, 'ast.dot')
+    arch = open(direcc, "w+")
+    arch.write(grafo)
+    arch.close()
+    os.system('dot -T svg -o ast.svg ast.dot')
+
+
     return Arbol_ast.getConsola()
 def listaErrores():
     return errores

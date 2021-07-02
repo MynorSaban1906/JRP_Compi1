@@ -1,4 +1,5 @@
 
+from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
@@ -29,6 +30,12 @@ class Length(Funcion):
 
         return len(simbolo.getValor())# se devuelve el valor ya redondeado "lista para imprimir" 
 
+
+    def getNodo(self):
+        nodo=NodoAST("LENGTH")
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+
+        return nodo
 
 
     def getIdentificador(self):

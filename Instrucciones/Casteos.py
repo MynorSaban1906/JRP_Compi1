@@ -107,11 +107,27 @@ class Casteos(Instruccion):
 
 
     def getNodo(self):
-        nodo=NodoAST("PRIMITIVO")
-        nodo.Agregar_Hijo(str(self.getTipo()))
+        nodo=NodoAST("CASTEO")
+        nodo.Agregar_Hijo(self.simb(self.getTipo().name))
         nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
         return nodo
         
+
+    def simb(self,tipo):
+        if tipo=="ENTERO":
+            return "Int"
+        elif tipo=="CADENA":
+            return "String"
+        elif tipo=="BOOLEANO":
+            return "Booleano"
+        elif tipo=="CHARACTER":
+            return "Char"
+        elif tipo=="NULO":
+            return "Null"
+        elif tipo=="ARREGLO":
+            return "ARREGLO"
+        elif tipo=="DECIMAL":
+            return "Double"
 
     def getTipo(self):
         return self.tipo
@@ -124,12 +140,6 @@ class Casteos(Instruccion):
 
     def setExpresion(self,expresion):
         self.expresion= expresion
-
-    def setValor(self, expresion):
-        self.expresion=expresion
-
-    def getValor(self):
-        return self.expresion
 
     def getFila(self):
         return self.fila

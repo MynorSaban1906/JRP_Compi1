@@ -1,3 +1,4 @@
+from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Continue import Continue
 from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Tipo import OperadorAritmetico,TIPO
@@ -48,3 +49,16 @@ class For(Instruccion):
 
             else:
                 return Excepcion("Semantico", "Tipo de dato no booleano en ciclo for.", self.fila, self.columna)
+    def getNodo(self):
+        nodo=NodoAST("FOR")
+        nodo.Agregar_Hijo_Nodo(self.inicial.getNodo())
+        nodo.Agregar_Hijo_Nodo(self.condicion.getNodo())
+        nodo.Agregar_Hijo_Nodo(self.paso.getNodo())
+        
+        instrucciones=NodoAST("INSTRUCCIONES")
+        for instr in self.instrucciones:
+            instrucciones.Agregar_Hijo_Nodo(instr.getNodo())
+
+        nodo.Agregar_Hijo_Nodo(instrucciones)
+        
+        return nodo

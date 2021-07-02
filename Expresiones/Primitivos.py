@@ -15,7 +15,7 @@ class Primitivos(Instruccion):
 
     def getNodo(self):
         nodo=NodoAST("PRIMITIVO")
-        nodo.Agregar_Nodo_Hijo(str(self.getValor()))
+        nodo.Agregar_Hijo(str(self.getValor()))
         return nodo
         
 

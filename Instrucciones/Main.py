@@ -1,3 +1,4 @@
+from Instrucciones.Continue import Continue
 from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Tipo import OperadorAritmetico,TIPO
 from abc import ABC, abstractmethod
@@ -25,7 +26,10 @@ class Main(Instruccion):
                 err = Excepcion("Semantico", "Sentencia BREAK fuera de ciclo", instruccion.fila, instruccion.columna)
                 tree.getExcepciones().append(err)
                 tree.updateConsola(err.toString())
-
+            if isinstance(value, Continue): 
+                err = Excepcion("Semantico", "Sentencia CONTINUE fuera de ciclo", instruccion.fila, instruccion.columna)
+                tree.getExcepciones().append(err)
+                tree.updateConsola(err.toString())
 
     def getNodo(self):
         nodo=NodoAST("MAIN")

@@ -1,8 +1,5 @@
+from TablaArbol.NodoAST import NodoAST
 from TablaArbol.Excepcion import Excepcion
-from TablaArbol.Tipo import OperadorAritmetico,TIPO
-from abc import ABC, abstractmethod
-from TablaArbol.Simbolo import Simbolo
-from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 
 
@@ -14,14 +11,29 @@ class Case(Instruccion):
         self.instrucciones = instrucciones
         self.fila = fila
         self.columna = columna
+        self.valor=None
 
     def interpretar(self, tree, table):
         retorno = self.expresion.interpretar(tree, table)  # RETORNA CUALQUIER VALOR
         if isinstance(retorno, Excepcion) :
             return retorno
-
+        self.valor=retorno
         return retorno
         
+
+    def getNodo(self):
+        nodo=NodoAST("CASE ")
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+
+        instrucciones=NodoAST("INSTRUCCIONES")
+        for instr in self.instrucciones:
+            instrucciones.Agregar_Hijo_Nodo(instr.getNodo())
+
+        nodo.Agregar_Hijo_Nodo(instrucciones)
+        return nodo
+
+
+
     def getExpresion(self):
         return self.expresion
 

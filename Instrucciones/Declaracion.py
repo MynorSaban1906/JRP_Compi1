@@ -30,8 +30,10 @@ class Declaracion(Instruccion):
 
     def getNodo(self):
         nodo=NodoAST("DECLARACION")
+        nodo.Agregar_Hijo("var")
         nodo.Agregar_Hijo(str(self.getIdentificador()))
-        if self.getExpresion!=None:
+        nodo.Agregar_Hijo("=")
+        if self.getExpresion()!=None:
             nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
         return nodo
         

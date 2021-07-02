@@ -59,10 +59,10 @@ class Arbol:
         self.funciones.append(funcion)
 
 
-
     def getDot(self, raiz): ## DEVUELVE EL STRING DE LA GRAFICA EN GRAPHVIZ
         self.dot = ""
         self.dot += "digraph {\n"
+        self.dot += 'bgcolor="#21495c ";\n edge[color ="#b9ff00"];\nnode[style="filled" fillcolor="#2b8ea4 " fontcolor="white" color ="#007add"]'
         self.dot += "n0[label=\"" + raiz.getValor().replace("\"", "\\\"") + "\"];\n"
         self.contador = 1
         self.recorrerAST("n0", raiz)
@@ -70,8 +70,9 @@ class Arbol:
         return self.dot
 
     def recorrerAST(self, idPadre, nodoPadre):
-        for hijo in nodoPadre.getHijos():
+        for hijo in nodoPadre.getNodos_Hijos():
             nombreHijo = "n" + str(self.contador)
+            print(hijo.valor.replace("\"", "\\\""))
             self.dot += nombreHijo + "[label=\"" + hijo.getValor().replace("\"", "\\\"") + "\"];\n"
             self.dot += idPadre + "->" + nombreHijo + ";\n"
             self.contador += 1

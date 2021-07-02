@@ -1,3 +1,4 @@
+from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
@@ -25,6 +26,11 @@ class ToUpper(Funcion):
         
         return simbolo.getValor().upper() # se devuelve el valor en solo mayusculas
 
+    def getNodo(self):
+        nodo=NodoAST("TOUPPER")
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+
+        return nodo
 
 
     def getIdentificador(self):

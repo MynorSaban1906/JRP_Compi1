@@ -31,4 +31,4 @@ class NodoAST():
         self.valor=valor
 
     def getValor(self):
-        return self.valor
+        return str(self.valor)

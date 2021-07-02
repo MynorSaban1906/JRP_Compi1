@@ -35,6 +35,7 @@ class Asignacion(Instruccion) :
     def getNodo(self):
         nodo=NodoAST("ASIGNACION")
         nodo.Agregar_Hijo(str(self.getIdentificador()))
+        nodo.Agregar_Hijo("=")
         nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
         return nodo
         

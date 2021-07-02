@@ -1,7 +1,6 @@
+
+from TablaArbol.NodoAST import NodoAST
 from TablaArbol.Excepcion import Excepcion
-from TablaArbol.Tipo import OperadorAritmetico,TIPO
-from abc import ABC, abstractmethod
-from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
 from Instrucciones.Instruccion import Instruccion
 from Instrucciones.Break import Break
@@ -37,7 +36,7 @@ class Switch(Instruccion):
                             if isinstance(InstruccionesCase, Return): return InstruccionesCase
                             if isinstance(InstruccionesCase, Break): 
                                 bandera=True 
-                                return InstruccionesCase
+                                return None
                             bandera=False # SI EL CASE NO TIENE BREAK SIGUE EVALUANDO LOS DEMAS CASOS
                     elif bandera==False and (self.default==None or str(expresioncase)==str(expresion)):
                         tablaCase1 = TablaSimbolos(table)
@@ -47,7 +46,7 @@ class Switch(Instruccion):
                             if isinstance(InstruccionesCase, Excepcion) :
                                 tree.getExcepciones().append(InstruccionesCase)
                                 tree.updateConsola(InstruccionesCase.toString())
-                            if isinstance(InstruccionesCase, Break): return InstruccionesCase
+                            if isinstance(InstruccionesCase, Break): return None
                             if isinstance(InstruccionesCase, Return): return InstruccionesCase
 
                 
@@ -78,4 +77,21 @@ class Switch(Instruccion):
                 else:
                     break
 
-    
+    def getNodo(self):
+        nodo=NodoAST("SWITCH")
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+
+        instrucciones=NodoAST("INSTRUCCIONES")
+        for instr in self.listaInstrucciones:
+            instrucciones.Agregar_Hijo_Nodo(instr.getNodo())
+        
+
+        if self.default !=None:
+            default=NodoAST("Default")
+            for instr in self.default:
+                default.Agregar_Hijo_Nodo(instr.getNodo())
+            instrucciones.Agregar_Hijo_Nodo(default)
+
+        nodo.Agregar_Hijo_Nodo(instrucciones)
+        
+        return nodo

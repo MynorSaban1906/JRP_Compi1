@@ -1,3 +1,4 @@
+from TablaArbol.NodoAST import NodoAST
 from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Tipo import OperadorAritmetico,TIPO
 from abc import ABC, abstractmethod
@@ -33,3 +34,17 @@ class Inc_Dec(Instruccion):
 
 
         return simbolo.getValor()
+
+
+    def getNodo(self):
+        nodo=NodoAST("INC O DEC")
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+        nodo.Agregar_Hijo(self.sim(self.tipo.name))
+        return nodo
+        
+
+    def sim(self, operador):
+        if operador=="AUMENTO":
+            return "++"
+        elif operador=="DECREMENTO":
+            return "--"

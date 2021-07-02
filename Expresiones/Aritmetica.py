@@ -1,3 +1,4 @@
+from tkinter.constants import SEL
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.Tipo import TIPO,OperadorAritmetico
 from Expresiones.ExpresionIdentificador import ExpresionIdentificador
@@ -250,13 +251,34 @@ class Aritmetica(Instruccion):
         nodo= NodoAST("ARITMETICA")  
         if self.OperacionDer != None:
             nodo.Agregar_Hijo_Nodo(self.OperacionIzq.getNodo())
-            nodo.Agregar_Hijo(str(self.operador))
+            nodo.Agregar_Hijo(self.simb(self.operador.name))
             nodo.Agregar_Hijo_Nodo(self.OperacionDer.getNodo())
         else:
-            nodo.Agregar_Hijo(str(self.operador))
+            nodo.Agregar_Hijo(self.simb(self.operador.name))
             nodo.Agregar_Hijo_Nodo(self.OperacionIzq.getNodo())
             
         return nodo
+
+
+    def simb(self, operador):
+        if operador=="MAS":
+            return "+"
+        elif operador=="MENOS":
+            return "-"
+        elif operador=="DIV":
+            return "/"
+        elif operador=="POR":
+            return "*"
+        elif operador=="POT":
+            return "**"
+        elif operador=="MOD":
+            return "%"
+        elif operador=="UMENOS":
+            return "-"
+        elif operador=="AUMENTO":
+            return "++"
+        elif operador=="DECREMENTO":
+            return "--"
 
 
     def getFila(self):

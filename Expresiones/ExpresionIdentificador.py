@@ -26,8 +26,8 @@ class ExpresionIdentificador(Instruccion) :
 
 
     def getNodo(self):
-        nodo=NodoAST("IDENTIFICICADOR")
-        nodo.Agregar_Nodo_Hijo(str(self.getIdentificador()))
+        nodo=NodoAST("IDENTIFICADOR")
+        nodo.Agregar_Hijo(str(self.getIdentificador()))
         return nodo
         
 

@@ -72,12 +72,10 @@ class InvocaFuncion(Instruccion):
         nodo.Agregar_Hijo(str(self.getIdentificador()))
         parametros =NodoAST("PARAMETROS")
         for param in self.getParametros():
-            parametro= NodoAST("PARAMETRO")
             parametros.Agregar_Hijo_Nodo(param.getNodo())
         nodo.Agregar_Hijo_Nodo(parametros)
 
-        nodo.Agregar_Hijo_Nodo(instrucciones)
-        
+    
         return nodo
 
 

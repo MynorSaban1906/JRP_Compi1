@@ -47,3 +47,4 @@ class Read(Instruccion):
         nodo=NodoAST("READ")
         return nodo
         
+        

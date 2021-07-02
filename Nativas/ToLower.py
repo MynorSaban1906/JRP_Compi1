@@ -1,3 +1,4 @@
+from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
@@ -25,6 +26,11 @@ class ToLower(Funcion):
         
         return simbolo.getValor().lower() # se devuelve el valor en solo mayusculas
 
+    def getNodo(self):
+        nodo=NodoAST("TOLOWER")
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+
+        return nodo
 
 
     def getIdentificador(self):

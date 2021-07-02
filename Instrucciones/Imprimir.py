@@ -29,7 +29,7 @@ class Imprimir(Instruccion):
 
     def getNodo(self):
         nodo=NodoAST("IMPRIMIR")
-        nodo.Agregar_Hijo_Nodo(str(self.expresion.getNodo()))
+        nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
         
         return nodo
 
@@ -46,3 +46,9 @@ class Imprimir(Instruccion):
     def setColumna(self, columna):
         self.columna= columna
         
+
+    def getExpresion(self):
+        return self.expresion
+
+    def setExpresion(self, expresion):
+        self.expresion=expresion 
