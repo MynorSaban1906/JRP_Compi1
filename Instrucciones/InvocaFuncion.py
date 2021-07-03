@@ -12,6 +12,7 @@ class InvocaFuncion(Instruccion):
         self.parametros=parametros  
         self.columna = columna
         self.tipo =None
+        self.arreglo= False
 
         
     def interpretar(self, tree, table):
@@ -32,14 +33,14 @@ class InvocaFuncion(Instruccion):
                 if funcion.parametros[contador]['identificador'] in ('truncate##param1','typeof##param1','round##param1','length##param1'):
                     funcion.parametros[contador]['tipo']=expresion.getTipo()
                     #creacion de simbolo e ingresandolo a la tabla de simbolo
-                    simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'], self.getFila(), self.getColumna(),resultadoExpresion)
+                    simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'],self.arreglo, self.getFila(), self.getColumna(),resultadoExpresion)
                     result=nuevaTabla.setTabla(simbolo)
                     if isinstance(result,Excepcion): return result
                 
                 else:
                     if funcion.parametros[contador]['tipo']== expresion.getTipo():
                         #creacion de simbolo e ingresandolo a la tabla de simbolo
-                        simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'], self.getFila(), self.getColumna(),resultadoExpresion)
+                        simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'],self.arreglo, self.getFila(), self.getColumna(),resultadoExpresion)
                         result=nuevaTabla.setTabla(simbolo)
                         if isinstance(result,Excepcion): return result
 

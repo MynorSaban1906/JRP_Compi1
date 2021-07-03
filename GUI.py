@@ -15,9 +15,10 @@ from tkinter import filedialog as fd # filechooser
 from tkinter import messagebox as mb
 from tkinter import Canvas,Frame
 import tkinter as tk
+from tkinter.ttk import Treeview
 import webbrowser
 import re
-from gramatica import listaErrores,analizador
+#from gramatica import listaErrores,analizador
 
 
 reservadas = {
@@ -84,7 +85,7 @@ class GUI:
         self.file_item.add_command(label='abrir', command=self.ayuda)
 
         self.herramienta_item = Menu(self.menu,tearoff=0)    # SUB MENU HERRAMIENTAS
-        self.herramienta_item.add_command(label='Interpretar',command=self.analizar)
+#        self.herramienta_item.add_command(label='Interpretar',command=self.analizar)
         self.herramienta_item.add_command(label='Debugger')
         
         self.report_item = Menu(self.menu,tearoff=0)    # SUB MENU REPORTES
@@ -106,9 +107,64 @@ class GUI:
         self.Entrada.place(x=50, y = 50) 
 
 
-        self.Consola = scrolledtext.ScrolledText(self.window,width=70,height=25, background="black")   # textConsola area para la consola 
+        self.Consola = scrolledtext.ScrolledText(self.window,width=70,height=23, background="black")   # textConsola area para la consola 
         self.Consola.place(x=750, y =50) 
-        self.Consola.config(fg="lawn green",bg="gray20")      
+        self.Consola.config(fg="lawn green",bg="gray20")   
+
+        self.simbolot = Label(self.window, text="Proyecto 1 - Fase 1", font=("Times New Roman", 13), bg='turquoise1')
+        self.simbolot.pack(fill=X) 
+        self.simbolot.place(x=50, y =450) 
+
+
+
+        self.tree = Treeview(self.window, selectmode='browse')
+        self.tree.place(x=200, y=455,height=190)
+
+        vsb = Scrollbar(self.window, orient="vertical", command=self.tree.yview)
+        vsb.place(x=1101, y=455, height=190)
+
+        self.tree.configure(yscrollcommand=vsb.set)
+
+        self.tree["columns"] = ("1", "2","3","4","5", "6","7")
+        self.tree['show'] = 'headings'
+        self.tree.column("1", width=130, anchor='c')
+        self.tree.column("2", width=130, anchor='c')
+        self.tree.column("3", width=130, anchor='c')
+        self.tree.column("4", width=130, anchor='c')
+        self.tree.column("5", width=130, anchor='c')
+        self.tree.column("6", width=130, anchor='c')
+        self.tree.column("7", width=130, anchor='c')
+        self.tree.heading("1", text="Identificador")
+        self.tree.heading("2", text="Tipo")
+        self.tree.heading("3", text="Tipo")
+        self.tree.heading("4", text="Entorno")
+        self.tree.heading("5", text="Valor")
+        self.tree.heading("6", text="Linea")
+        self.tree.heading("7", text="Columna")
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola1"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola2"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola3"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola4"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola5"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola6"))
+        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola7"))
+
+
+
+
 
 
         self.posicion = Label(self.window,text=f" Linea: 0      Columa: 0", font=("Times New Roman", 13), bg='deep sky blue')
@@ -168,13 +224,7 @@ class GUI:
     def nuevo_archivo(self):
         self.Entrada.delete(1.0, END)
 
-    def analizar(self):
-        self.Consola.delete(1.0, END)
 
-        entrada= self.Entrada.get("1.0",END) # FILA 1 COLUMNA 0
-        scanner= analizador(entrada,self.Consola)
-        self.Consola.delete(1.0, END)
-        self.Consola.insert("1.0",scanner)        
 
 
 
@@ -437,7 +487,7 @@ class TextoAccion(tk.Frame):
         # bg -> color de fondo --- foreground -> color al texto --- selectbrackgroud -> color a lo que seleccione ---
         # inserbackgroud -> color al puntero
         self.text = tk.Text(self, bg='#103045', foreground="white", selectbackground="steel blue",
-                            insertbackground='white',  width=78, height=25)
+                            insertbackground='white',  width=78, height=23)
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         self.text.configure(yscrollcommand=self.scrollbar.set)
 
@@ -514,6 +564,15 @@ class TextoLinea(tk.Canvas):
 
 
 
+'''
+    def analizar(self):
+        self.Consola.delete(1.0, END)
 
+        entrada= self.Entrada.get("1.0",END) # FILA 1 COLUMNA 0
+        scanner= analizador(entrada,self.Consola)
+        self.Consola.delete(1.0, END)
+        self.Consola.insert("1.0",scanner)   
+
+'''     
 
 start = GUI()

@@ -15,15 +15,16 @@ class Inc_Dec(Instruccion):
         self.tipo =tipo
         self.fila = fila
         self.columna = columna
+        self.arreglo = False
 
     def interpretar(self, tree, table):
         value = self.expresion.interpretar(tree, table) # Valor a asignar a la variable
         if isinstance(value, Excepcion): return value
         
         if self.tipo==OperadorAritmetico.AUMENTO:
-            simbolo= Simbolo(self.identificador.lower(),self.expresion.tipo,self.fila,self.columna,value + 1)
+            simbolo= Simbolo(self.identificador.lower(),self.expresion.tipo,self.arreglo,self.fila,self.columna,value + 1)
         elif self.tipo==OperadorAritmetico.DECREMENTO:
-            simbolo= Simbolo(self.identificador.lower(),self.expresion.tipo,self.fila,self.columna,value - 1)
+            simbolo= Simbolo(self.identificador.lower(),self.expresion.tipo,self.arreglo,self.fila,self.columna,value - 1)
 
         else:
             return Excepcion("Semantico", "error en caracter de incremento o decremento ", self.fila, self.columna)

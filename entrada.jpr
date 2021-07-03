@@ -1,12 +1,8 @@
 main(){
-
-  print("prueba 1 de funcion READ")
-  var a= read()
-  print("Imprime la cadena que se ingreso : "+a)
-  print("\n")
-  print("prueba 2 de funcion READ")
-  var a1= read()
-  print("Imprime la cadena que se ingreso : "+a1)
-  print("fin ")
+  print("hola")
+  var a = 10
+  print(a)
+  int[ ][] arr1 = new int[4][2]
+  arr1[3][4][4]=9
 }
 

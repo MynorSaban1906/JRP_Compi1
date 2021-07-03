@@ -1,4 +1,6 @@
 #se importan las clases necesarias 
+from Instrucciones.ModificaArreglo import ModificaArreglo
+from Instrucciones.AccesoArreglo import AcessoArreglo
 import os
 import sys
 from TablaArbol.NodoAST import NodoAST
@@ -262,6 +264,7 @@ def p_instruccion(t) :
                         |   return_instr final
                         |   continue_instr final
                         |   definicionArreglo_instr final
+                        |   modificacionArreglo_instr final
     '''
     t[0] = t[1]
 
@@ -648,6 +651,19 @@ def p_lista_expresiones_2(t) :
 
 
 
+# .............. ACCESO A ARREGLOS ..................
+
+def p_Acceso_Arreglo(t) :
+    'expresion    : ID lista_expresiones'
+    t[0] = AcessoArreglo(t[1], t[2] ,t.lineno(1), find_column(input, t.slice[1]))
+
+# .............. MODIFICACION DE ARREGLOS ..................
+
+def p_Modificacion_Arreglos(t) :
+    'modificacionArreglo_instr   : ID lista_expresiones IGUAL expresion'
+    t[0] = ModificaArreglo(t[1], t[2],t[4] ,t.lineno(3), find_column(input, t.slice[3]))
+
+
 
 
 import ply.yacc as yacc
@@ -704,7 +720,7 @@ def parse(inp) :
     return parser.parse(inp)
 
 #INTERFAZ
-''''
+
 archivo=open("entrada.jpr","r")
 entrada=archivo.read()
 
@@ -719,7 +735,7 @@ for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICO
 
 
 for instruccion in Arbol_ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
-    if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion):
+    if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)or isinstance(instruccion, DeclaraArreglo):
         value = instruccion.interpretar(Arbol_ast,TablaSimboloGlobal)
         if isinstance(value, Excepcion) :
             Arbol_ast.getExcepciones().append(value)
@@ -762,7 +778,7 @@ for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
 
 for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
     if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)
-            or isinstance(instruccion, Funcion)):
+            or isinstance(instruccion, Funcion) or isinstance(instruccion,DeclaraArreglo)):
         err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
         Arbol_ast.getExcepciones().append(err)
         Arbol_ast.updateConsola(err.toString())
@@ -858,3 +874,4 @@ def analizador(entrada,consola):
 def listaErrores():
     return errores
 
+'''

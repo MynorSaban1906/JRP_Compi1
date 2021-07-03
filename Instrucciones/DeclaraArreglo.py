@@ -19,13 +19,15 @@ class DeclaraArreglo(Instruccion):
 
     def interpretar(self, tree, table):
         if self.getTipo1() != self.getTipo2():        #VERIFICACION DE TIPOS
-            return Excepcion("Semantico", "Tipo de dato diferente en declaracion de  Arreglo.", self.fila, self.columna)
+            return Excepcion("Semantico", "Tipo de dato diferente en declaracion de  Arreglo.", self.getFila(), self.getColumna() )
         
         if self.getDimensiones() != len(self.getExpresiones()):   #VERIFICACION DE DIMENSIONES
-            return Excepcion("Semantico", "Dimensiones diferentes en Arreglo.", self.fila, self.columna)
+            return Excepcion("Semantico", "Dimensiones diferentes en Arreglo.", self.getFila(), self.getColumna() )
 
-        # CREACION DEL ARREGLO
-        ArregloDimension = self.crearDimensiones(tree, table, copy.copy(self.expresiones))     #RETORNA EL ARREGLO DE DIMENSIONES
+        # se crea el arrreglo
+        ArregloDimension = self.crearDimensiones(tree, table, copy.copy(self.getExpresiones()))     #RETORNA EL ARREGLO DE DIMENSIONES
+       
+       
         if isinstance(ArregloDimension, Excepcion): return ArregloDimension
         simbolo = Simbolo(str(self.getIdentificador()).lower(), self.getTipo1(), self.getArreglo(), self.getFila(), self.getColumna() ,ArregloDimension)
         result = table.setTabla(simbolo)
@@ -50,18 +52,27 @@ class DeclaraArreglo(Instruccion):
 
 
     def crearDimensiones(self, tree, table, expresiones):
-        arr = []
-        if len(expresiones) == 0:
+        arr = [] # este sirve para que se guarde la recursividad
+
+        if len(expresiones) == 0: # este es el metodo de salida para la recursividad
+            # si ya no hay datos en expresiones devuelve un none
+            # asi empieza a salir de la recursividad
             return None
-        dimension = expresiones.pop(0)
-        num = dimension.interpretar(tree, table)
-        if isinstance(num, Excepcion): return num
-        if dimension.getTipo() != TIPO.ENTERO:
+        
+        dimension = expresiones.pop(0) # va a sacar el primero
+        
+        num = dimension.interpretar(tree, table) #  interpreta el valor de la expresion
+        
+        if isinstance(num, Excepcion): return num # verifica si hay algun error
+       
+        if dimension.getTipo() != TIPO.ENTERO: # verifica  si el dato que tiene dimension se compara que aley tiene que ser entero
             return Excepcion("Semantico", "Expresion diferente a ENTERO en Arreglo.", self.fila, self.columna)
         contador = 0
-        while contador < num:
-            arr.append(self.crearDimensiones(tree, table, copy.copy(expresiones)))
+
+        while contador < num: #  contador debe se ser menor al contador de parametros
+            arr.append(self.crearDimensiones(tree, table, copy.copy(expresiones))) # el copy sirve para referenciar al valor 
             contador += 1
+
         return arr
 
 

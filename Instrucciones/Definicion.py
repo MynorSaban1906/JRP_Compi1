@@ -14,9 +14,10 @@ class Definicion(Instruccion) :
         self.fila = fila
         self.tipo=TIPO.NULO
         self.columna = columna
+        self.arreglo = False
 
     def interpretar(self, tree, table):
-        simbolo = Simbolo(self.identificador.lower(),self.tipo,self.fila,self.columna,None)
+        simbolo = Simbolo(self.identificador.lower(),self.tipo,self.arreglo,self.fila,self.columna,None)
         result = table.setTabla(simbolo)
         
         if isinstance(result,Excepcion): return result
