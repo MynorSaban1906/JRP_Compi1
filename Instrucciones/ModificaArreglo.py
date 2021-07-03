@@ -41,12 +41,12 @@ class ModificaArreglo(Instruccion):
 
     def getNodo(self):
         nodo = NodoAST("MODIFICACION ARREGLO")
-        nodo.agregarHijo(str(self.identificador))
+        nodo.Agregar_Hijo(str(self.identificador))
         exp = NodoAST("EXPRESIONES DE LAS DIMENSIONES")
         for expresion in self.getListaExpresion():
-            exp.agregarHijoNodo(expresion.getNodo())
-        nodo.agregarHijoNodo(exp)
-        nodo.agregarHijoNodo(self.valor.getNodo())
+            exp.Agregar_Hijo_Nodo(expresion.getNodo())
+        nodo.Agregar_Hijo_Nodo(exp)
+        nodo.Agregar_Hijo_Nodo(self.valor.getNodo())
         return nodo
 
     def modificarDimensiones(self, tree, table, expresiones, arreglo, valor):

@@ -720,7 +720,7 @@ def parse(inp) :
     return parser.parse(inp)
 
 #INTERFAZ
-
+'''
 archivo=open("entrada.jpr","r")
 entrada=archivo.read()
 
@@ -796,7 +796,6 @@ def analizador(entrada,consola):
     Arbol_ast = Arbol(instrucciones)
     TablaSimboloGlobal = TablaSimbolos()
     Arbol_ast.setTablaSimboloGlobal(TablaSimboloGlobal)
-    Arbol_ast.setConsolaGUI(consola)
     crearNativas(Arbol_ast)
     for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
         Arbol_ast.getExcepciones().append(error)
@@ -804,7 +803,7 @@ def analizador(entrada,consola):
 
 
     for instruccion in Arbol_ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
-        if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion):
+        if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)or isinstance(instruccion, DeclaraArreglo):
             value = instruccion.interpretar(Arbol_ast,TablaSimboloGlobal)
             if isinstance(value, Excepcion) :
                 Arbol_ast.getExcepciones().append(value)
@@ -835,7 +834,7 @@ def analizador(entrada,consola):
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
             if isinstance(value, Return): 
-                err = Excepcion("Semantico", "Sentencia RETURN fuera de una funcion", instruccion.fila, instruccion.columna)
+                err = Excepcion("Semantico", "Sentencia RETURN fuera de un ciclo", instruccion.fila, instruccion.columna)
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
             if isinstance(value, Continue): 
@@ -847,10 +846,11 @@ def analizador(entrada,consola):
 
     for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
         if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)
-                or isinstance(instruccion, Funcion)):
+                or isinstance(instruccion, Funcion) or isinstance(instruccion,DeclaraArreglo)):
             err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
+
             
 
     init = NodoAST("RAIZ")
@@ -871,7 +871,6 @@ def analizador(entrada,consola):
 
 
     return Arbol_ast.getConsola()
+    
 def listaErrores():
     return errores
-
-'''

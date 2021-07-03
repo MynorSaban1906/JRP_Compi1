@@ -39,14 +39,14 @@ class DeclaraArreglo(Instruccion):
 
     def getNodo(self):
         nodo = NodoAST("DECLARACION ARREGLO")
-        nodo.agregarHijo(str(self.getTipo1()))
-        nodo.agregarHijo(str(self.getDimensiones()))
-        nodo.agregarHijo(str(self.getIdentificador()))
-        nodo.agregarHijo(str(self.getTipo2()))
+        nodo.Agregar_Hijo(str(self.getTipo1() ))
+        nodo.Agregar_Hijo(str(self.getDimensiones()))
+        nodo.Agregar_Hijo(str(self.getIdentificador()))
+        nodo.Agregar_Hijo(str(self.getTipo2()))
         exp = NodoAST("DIMENSIONES ARREGLO")
         for expresion in self.getExpresiones():
-            exp.agregarHijoNodo(expresion.getNodo())
-        nodo.agregarHijoNodo(exp)
+            exp.Agregar_Hijo_Nodo(expresion.getNodo())
+        nodo.Agregar_Hijo_Nodo(exp)
         return nodo
 
 

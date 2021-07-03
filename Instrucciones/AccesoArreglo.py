@@ -40,11 +40,11 @@ class AcessoArreglo(Instruccion):
 
     def getNodo(self):
         nodo = NodoAST("DECLARACION ARREGLO")
-        nodo.agregarHijo(str(self.getIdentificador()))
+        nodo.Agregar_Hijo(str(self.getIdentificador()))
         exp = NodoAST("DIMENSIONES ARREGLO")
         for expresion in self.getListaExpresion():
-            exp.agregarHijoNodo(expresion.getNodo())
-        nodo.agregarHijoNodo(exp)
+            exp.Agregar_Hijo_Nodo(expresion.getNodo())
+        nodo.Agregar_Hijo_Nodo(exp)
         return nodo
 
 

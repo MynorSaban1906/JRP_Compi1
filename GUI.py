@@ -18,7 +18,7 @@ import tkinter as tk
 from tkinter.ttk import Treeview
 import webbrowser
 import re
-#from gramatica import listaErrores,analizador
+from gramatica import listaErrores,analizador
 
 
 reservadas = {
@@ -85,7 +85,7 @@ class GUI:
         self.file_item.add_command(label='abrir', command=self.ayuda)
 
         self.herramienta_item = Menu(self.menu,tearoff=0)    # SUB MENU HERRAMIENTAS
-#        self.herramienta_item.add_command(label='Interpretar',command=self.analizar)
+        self.herramienta_item.add_command(label='Interpretar',command=self.analizar)
         self.herramienta_item.add_command(label='Debugger')
         
         self.report_item = Menu(self.menu,tearoff=0)    # SUB MENU REPORTES
@@ -224,7 +224,13 @@ class GUI:
     def nuevo_archivo(self):
         self.Entrada.delete(1.0, END)
 
+    def analizar(self):
+        self.Consola.delete(1.0, END)
 
+        entrada= self.Entrada.get("1.0",END) # FILA 1 COLUMNA 0
+        scanner= analizador(entrada,self.Consola)
+        self.Consola.delete(1.0, END)
+        self.Consola.insert("1.0",scanner)   
 
 
 
