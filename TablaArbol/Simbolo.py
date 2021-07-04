@@ -10,7 +10,7 @@ class Simbolo:
         self.columna = columna
         self.valor = valor
         self.arreglo= arreglo
-
+        self.dimension=None
 
     def getID(self):
         return self.id
@@ -44,3 +44,10 @@ class Simbolo:
 
     def getArreglo(self):
         return self.arreglo
+
+
+    def getDimension(self):
+        return self.dimension
+
+    def setFila(self, dimension):
+        self.dimension=dimension
