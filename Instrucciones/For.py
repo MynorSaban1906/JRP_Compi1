@@ -19,7 +19,7 @@ class For(Instruccion):
         self.columna = columna
 
     def interpretar(self, tree, table):
-        nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
+        nuevaTabla = TablaSimbolos(table,"FOR ",declaracionTipo="variable",treeview=table.treeview)       #NUEVO ENTORNO
         declaracion = self.inicial.interpretar(tree, nuevaTabla)
         if isinstance(declaracion, Excepcion): return declaracion # retorna error si no es correcta
 
@@ -29,7 +29,7 @@ class For(Instruccion):
             if isinstance(expresion, Excepcion): return expresion
             if self.condicion.tipo== TIPO.BOOLEANO:
                 if bool(expresion) == True:   # VERIFICA SI ES VERDADERA LA CONDICION
-                    nuevaTabla2 = TablaSimbolos(nuevaTabla)       #NUEVO ENTORNO
+                    nuevaTabla2 = TablaSimbolos(nuevaTabla ,"Funcion ",declaracionTipo="variable",treeview=table.treeview)       #NUEVO ENTORNO
                     for instruccion in self.instrucciones:
                         result = instruccion.interpretar(tree, nuevaTabla2) #EJECUTA INSTRUCCION ADENTRO DEL IF
                         if isinstance(result, Excepcion) :

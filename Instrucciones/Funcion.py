@@ -18,7 +18,7 @@ class Funcion(Instruccion):
         self.tipo=TIPO.NULO
 
     def interpretar(self, tree, table):
-        tablaNueva = TablaSimbolos(table)
+        tablaNueva = TablaSimbolos(table,"Funcion "+ str(self.getIdentificador()),declaracionTipo="variable",treeview=table.treeview)
         for instruccion in self.instrucciones:      # recorrre las instruciones dentro de las funciones
             value = instruccion.interpretar(tree,tablaNueva)
             if isinstance(value, Excepcion) :
@@ -45,6 +45,7 @@ class Funcion(Instruccion):
             parametro.Agregar_Hijo(param["tipo"])
             parametro.Agregar_Hijo(param["identificador"])
             parametros.Agregar_Hijo_Nodo(parametro)
+            
         nodo.Agregar_Hijo_Nodo(parametros)
 
         instrucciones=NodoAST("INSTRUCCIONES")

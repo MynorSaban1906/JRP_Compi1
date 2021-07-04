@@ -14,6 +14,7 @@ class Read(Instruccion):
         self.fila = fila
         self.columna = columna
         self.tama=1
+        
     def interpretar(self, tree, table):
         # para el read lo unico es usar un cuadro de dialogo que abra y listo se genera el read
         # lo unico es que no se valida si solo se da un aceptar ** esto ees igual a una cadena vacia ""***

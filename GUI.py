@@ -111,7 +111,7 @@ class GUI:
         self.Consola.place(x=750, y =50) 
         self.Consola.config(fg="lawn green",bg="gray20")   
 
-        self.simbolot = Label(self.window, text="Proyecto 1 - Fase 1", font=("Times New Roman", 13), bg='turquoise1')
+        self.simbolot = Label(self.window, text="Tabla de Simbolos", font=("Times New Roman", 13), bg='turquoise1')
         self.simbolot.pack(fill=X) 
         self.simbolot.place(x=50, y =450) 
 
@@ -121,7 +121,7 @@ class GUI:
         self.tree.place(x=200, y=455,height=190)
 
         vsb = Scrollbar(self.window, orient="vertical", command=self.tree.yview)
-        vsb.place(x=1101, y=455, height=190)
+        vsb.place(x=1123, y=455, height=190)
 
         self.tree.configure(yscrollcommand=vsb.set)
 
@@ -130,10 +130,10 @@ class GUI:
         self.tree.column("1", width=130, anchor='c')
         self.tree.column("2", width=130, anchor='c')
         self.tree.column("3", width=130, anchor='c')
-        self.tree.column("4", width=130, anchor='c')
-        self.tree.column("5", width=130, anchor='c')
-        self.tree.column("6", width=130, anchor='c')
-        self.tree.column("7", width=130, anchor='c')
+        self.tree.column("4", width=180, anchor='c')
+        self.tree.column("5", width=180, anchor='c')
+        self.tree.column("6", width=90, anchor='c')
+        self.tree.column("7", width=90, anchor='c')
         self.tree.heading("1", text="Identificador")
         self.tree.heading("2", text="Tipo")
         self.tree.heading("3", text="Tipo")
@@ -141,30 +141,6 @@ class GUI:
         self.tree.heading("5", text="Valor")
         self.tree.heading("6", text="Linea")
         self.tree.heading("7", text="Columna")
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola1"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola2"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola3"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola4"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola5"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola6"))
-        self.tree.insert("",'end',text="L1",values=("Big1","Best","Big1","Best","Big1","Best","hola7"))
-
-
-
-
 
 
         self.posicion = Label(self.window,text=f" Linea: 0      Columa: 0", font=("Times New Roman", 13), bg='deep sky blue')
@@ -228,7 +204,7 @@ class GUI:
         self.Consola.delete(1.0, END)
 
         entrada= self.Entrada.get("1.0",END) # FILA 1 COLUMNA 0
-        scanner= analizador(entrada,self.Consola)
+        scanner= analizador(entrada,self.Consola, self.tree)
         self.Consola.delete(1.0, END)
         self.Consola.insert("1.0",scanner)   
 

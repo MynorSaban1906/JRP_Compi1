@@ -1,8 +1,33 @@
 main(){
-  print("hola")
-  var a = 10
-  print(a)
-  int[ ][] arr1 = new int[4][2]
-  arr1[3][4][4]=9
+  var a ="declaracion dentro del main"
+  print("dentro de main")
+  ackermann(3,4)
+}
+var a = "declaracion1"
+func holamundo1(){
+  var hola=100
+  print(hola)
 }
 
+func holamundo2(){
+  var hola=100
+  print(hola)
+}
+
+func holamundo3(){
+  var hola=100
+  print(hola)
+}
+
+var contadorA = 0;
+
+func ackermann(int m, int n){
+    contadorA = contadorA + 1;
+    if (m == 0){
+        return n + 1;
+    } else if (m > 0 && n == 0){
+        return ackermann(m-1, 1)
+    } else{
+        return ackermann(m-1, ackermann(m, n-1))
+    }
+}

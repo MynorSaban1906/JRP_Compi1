@@ -45,6 +45,7 @@ class Arbol:
     def setTablaSimboloGlobal(self, TablaSimboloGlobal):
         self.TablaSimboloGlobal = TablaSimboloGlobal
 
+    
 
     def getFunciones(self):
         return self.funciones
@@ -55,8 +56,12 @@ class Arbol:
                 return funcion
         return None
     
-    def addFuncion(self, funcion):
+    def addFuncion(self, funcion,treeview=None):
         self.funciones.append(funcion)
+        if treeview!=None:
+            treeview.insert('','end', text=str(funcion.getIdentificador()),
+                value=[funcion.identificador,"funcion", "---", "---", "----", funcion.fila, funcion.columna])
+
 
 
     def getDot(self, raiz): ## DEVUELVE EL STRING DE LA GRAFICA EN GRAPHVIZ
@@ -72,8 +77,7 @@ class Arbol:
     def recorrerAST(self, idPadre, nodoPadre):
         for hijo in nodoPadre.getNodos_Hijos():
             nombreHijo = "n" + str(self.contador)
-            print(hijo.valor.replace("\"", "\\\""))
-            self.dot += nombreHijo + "[label=\"" + hijo.getValor().replace("\"", "\\\"") + "\"];\n"
+            self.dot += nombreHijo + "[label=\"" + hijo.valor.replace("\"", "\\\"") + "\"];\n"
             self.dot += idPadre + "->" + nombreHijo + ";\n"
             self.contador += 1
             self.recorrerAST(nombreHijo, hijo)
