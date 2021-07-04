@@ -14,7 +14,7 @@ class Switch(Instruccion):
         self.columna = columna
 
     def interpretar(self, tree, table):
-        nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
+        nuevaTabla = TablaSimbolos(table," SWITCH " ,declaracionTipo="variable",treeview=table.treeview)       #NUEVO ENTORNO
         expresion = self.expresion.interpretar(tree, nuevaTabla)
         if isinstance(expresion, Excepcion): return expresion # retorna error si no es correcta
         bandera= None

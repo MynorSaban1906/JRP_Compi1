@@ -810,12 +810,15 @@ print(Arbol_ast.getConsola())
 
 '''
 
-def analizador(entrada,consola):
+def analizador(entrada,consola,tablaGUI):
     instrucciones = parse(entrada) #ARBOL AST
     Arbol_ast = Arbol(instrucciones)
-    TablaSimboloGlobal = TablaSimbolos()
+    Arbol_ast.setConsolaGUI(consola)
+    TablaSimboloGlobal = TablaSimbolos(entorno="GLOBAL",declaracionTipo="variable",treeview=tablaGUI)
     Arbol_ast.setTablaSimboloGlobal(TablaSimboloGlobal)
+    
     crearNativas(Arbol_ast)
+
     for error in errores:                   #CAPTURA DE ERRORES LEXICOS Y SINTACTICOS
         Arbol_ast.getExcepciones().append(error)
         Arbol_ast.updateConsola(error.toString())
@@ -832,7 +835,7 @@ def analizador(entrada,consola):
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
         if isinstance(instruccion,Funcion):
-            Arbol_ast.addFuncion(instruccion)
+            Arbol_ast.addFuncion(instruccion,tablaGUI)
             
     for instruccion in Arbol_ast.getInstrucciones():      # 2DA PASADA (MAIN)
         contador = 0
@@ -887,6 +890,7 @@ def analizador(entrada,consola):
     arch.write(grafo)
     arch.close()
     os.system('dot -T svg -o ast.svg ast.dot')
+
 
 
     return Arbol_ast.getConsola()

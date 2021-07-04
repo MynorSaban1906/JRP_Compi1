@@ -27,7 +27,7 @@ class While(Instruccion):
 
             if self.condicion.tipo == TIPO.BOOLEANO:
                 if bool(condicion) == True:   # VERIFICA SI ES VERDADERA LA CONDICION
-                    nuevaTabla = TablaSimbolos(table)       #NUEVO ENTORNO
+                    nuevaTabla = TablaSimbolos(table," WHILE " ,declaracionTipo="variable",treeview=table.treeview)      #NUEVO ENTORNO
                     for instruccion in self.instrucciones:
                         result = instruccion.interpretar(tree, nuevaTabla) #EJECUTA INSTRUCCION ADENTRO DEL IF
                         if isinstance(result, Excepcion) :

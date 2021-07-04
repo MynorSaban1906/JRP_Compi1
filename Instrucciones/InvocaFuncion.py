@@ -21,7 +21,7 @@ class InvocaFuncion(Instruccion):
         funcion = tree.getFuncion(self.identificador.lower())
         if funcion==None: # si no encontro la funcion entonces  genera un errro
             return Excepcion("Semantico", "No se encontro la funcion "+ self.identificador, self.fila, self.columna)
-        nuevaTabla=TablaSimbolos(tree.getTablaSimboloGlobal())
+        nuevaTabla=TablaSimbolos(tree.getTablaSimboloGlobal(),"llama a funcion "+str(self.getIdentificador()) ,declaracionTipo="variable",treeview=table.treeview)
         # obtener los parametros 
         if len(funcion.getParametros())==len(self.getParametros()): # si trae los msmos parametros que la funcion 
             contador=0
@@ -48,8 +48,8 @@ class InvocaFuncion(Instruccion):
                     if funcion.parametros[contador]['tipo']== expresion.getTipo():
                         #creacion de simbolo e ingresandolo a la tabla de simbolo
                         simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'],self.arreglo, self.getFila(), self.getColumna(),resultadoExpresion)
-                        result=nuevaTabla.setTabla(simbolo)
-                        if isinstance(result,Excepcion): return result
+                        resultTabla=nuevaTabla.setTabla(simbolo)
+                        if isinstance(resultTabla,Excepcion): return resultTabla
 
                     
                     else:

@@ -31,6 +31,7 @@ class DeclaraArreglo(Instruccion):
         if isinstance(ArregloDimension, Excepcion): return ArregloDimension
         simbolo = Simbolo(str(self.getIdentificador()).lower(), self.getTipo1(), self.getArreglo(), self.getFila(), self.getColumna() ,ArregloDimension)
         result = table.setTabla(simbolo)
+        simbolo.getDimension(self.getDimensiones())
         if isinstance(result, Excepcion): return result
         return None
 

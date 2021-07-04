@@ -16,7 +16,7 @@ class Main(Instruccion):
         self.columna = columna
     
     def interpretar(self, tree, table):
-        nuevaTabla = TablaSimbolos(table) 
+        nuevaTabla = TablaSimbolos(table,"MAIN" ,declaracionTipo="variable",treeview=table.treeview) 
         for instruccion in self.instrucciones:      # REALIZAR LAS ACCIONES
             value = instruccion.interpretar(tree,nuevaTabla)
             if isinstance(value, Excepcion) :
