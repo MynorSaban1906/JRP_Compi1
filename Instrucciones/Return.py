@@ -21,14 +21,16 @@ class Return(Instruccion):
         #pero en este caso se obtiene el tipo de dato que tiene la expresion 
         #y se iguala al tipo de dato del return
         self.setTipo(self.getExpresion().getTipo())
-        self.setNodo(result )          # aqui se devuelve el valor en si, lo que se quiere devolver da la funcion o ciclo
+        self.setResult(result )          # aqui se devuelve el valor en si, lo que se quiere devolver da la funcion o ciclo
 
         return self
 
 
     def getNodo(self):
         nodo=NodoAST("BREAK")
-        nodo.Agregar_Hijo_Nodo(self.getExpresion().getNodo())
+
+        nodo.Agregar_Hijo_Nodo(self.expresion.getNodo())
+
         return nodo
 
 
@@ -57,8 +59,8 @@ class Return(Instruccion):
     def setTipo(self, tipo):
         self.tipo=tipo
 
-    def getNodo(self):
+    def getResult(self):
         return self.result
 
-    def setNodo(self, result):
+    def setResult(self, result):
         self.result =result

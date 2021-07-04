@@ -1,7 +1,8 @@
 main(){
   var a ="declaracion dentro del main"
   print("dentro de main")
-  ackermann(3,4)
+  holamundo3()
+  
 }
 var a = "declaracion1"
 func holamundo1(){
@@ -17,6 +18,7 @@ func holamundo2(){
 func holamundo3(){
   var hola=100
   print(hola)
+  return "hola"
 }
 
 var contadorA = 0;
