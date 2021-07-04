@@ -1,3 +1,4 @@
+from TablaArbol.Tipo import TIPO
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.Excepcion import Excepcion
 from Instrucciones.Instruccion import Instruccion
@@ -13,13 +14,17 @@ class ExpresionIdentificador(Instruccion) :
         self.fila = fila
         self.columna = columna
         self.tipo = None
-
+        self.tipo_arreglo=None
+        
     def interpretar(self, tree, table):
         simbolo = table.getTabla(self.identificador.lower())
         
         if simbolo == None:
             return Excepcion("Semantico", "Variable " + self.identificador + " no encontrada.", self.fila, self.columna)
-
+        
+        if simbolo.getArreglo():
+            self.tipo_arreglo=TIPO.ARREGLO
+            
         self.tipo = simbolo.getTipo()
         
         return simbolo.getValor()

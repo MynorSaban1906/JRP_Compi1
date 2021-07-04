@@ -561,6 +561,9 @@ def p_parametro(t) :
     'parametro     : tipo ID'
     t[0] = {'tipo':t[1],'identificador':t[2]}
 
+def p_parametroArreglo(t) :
+    'parametro     : tipo lista_Dimension ID'
+    t[0] = {'tipo':TIPO.ARREGLO,'identificador':t[3],'dimensiones':t[2],"tipo-arreglo":t[1]}
 
 
 #///////////////////////////////////////TIPO//////////////////////////////////////////////////
@@ -606,6 +609,8 @@ def p_parametrosLL_1(t) :
 def p_parametrosLL_2(t) :
     'parametros_llamada    : parametro_llamada'
     t[0] = [t[1]]
+
+
 
 #///////////////////////////////////////PARAMETRO LLAMADA A FUNCION//////////////////////////////////////////////////
 
@@ -720,7 +725,7 @@ def parse(inp) :
     return parser.parse(inp)
 
 #INTERFAZ
-
+'''
 archivo=open("entrada.jpr","r")
 entrada=archivo.read()
 
@@ -888,4 +893,3 @@ def analizador(entrada,consola):
     
 def listaErrores():
     return errores
-'''

@@ -1,3 +1,4 @@
+from TablaArbol.Tipo import TIPO
 from TablaArbol.Excepcion import Excepcion
 from TablaArbol.Simbolo import Simbolo
 from TablaArbol.ts import TablaSimbolos
@@ -26,7 +27,6 @@ class InvocaFuncion(Instruccion):
             contador=0
             for expresion in self.getParametros(): # se obtiene el valor del parametro en la llamada
                 resultadoExpresion=expresion.interpretar(tree,table)
-
                 if isinstance(resultadoExpresion,Excepcion): return resultadoExpresion
 
                 # se debe validar que sean del mismo tipo, los parametrso de la llamada con los parametros de la funcion
@@ -36,7 +36,14 @@ class InvocaFuncion(Instruccion):
                     simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'],self.arreglo, self.getFila(), self.getColumna(),resultadoExpresion)
                     result=nuevaTabla.setTabla(simbolo)
                     if isinstance(result,Excepcion): return result
-                
+
+                elif funcion.parametros[contador]['tipo-arreglo']== expresion.getTipo() and funcion.parametros[contador]['tipo']== TIPO.ARREGLO:
+                    arregloGuardado = table.getTabla(expresion.getIdentificador())
+
+                    if funcion.parametros[contador]['dimensiones'] != len(arregloGuardado.getValor()):   #VERIFICACION DE DIMENSIONES
+                        return Excepcion("Semantico", "Dimensiones diferentes en Arreglo.", self.getFila(), self.getColumna() )
+
+                    print("arreglo")
                 else:
                     if funcion.parametros[contador]['tipo']== expresion.getTipo():
                         #creacion de simbolo e ingresandolo a la tabla de simbolo
