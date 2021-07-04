@@ -41,6 +41,7 @@ class TablaSimbolos:
                 if tablaActual.tabla[simbolo.id].getTipo()==simbolo.getTipo() or  tablaActual.tabla[simbolo.id].getTipo()==TIPO.NULO or simbolo.getTipo()==TIPO.NULO:
                     tablaActual.tabla[simbolo.id].setValor(simbolo.getValor())
                     tablaActual.tabla[simbolo.id].setTipo(simbolo.getTipo())
+                    self.actualizar_treeview()
                     return None
                 return Excepcion("Semantico", "Tipo de diferente en la variable " + simbolo.id , simbolo.fila, simbolo.columna)
             else:
@@ -48,14 +49,14 @@ class TablaSimbolos:
         return Excepcion("Semantico", "Variable No encontrada en Asignacion", simbolo.getFila(), simbolo.getColumna())
 
 
-    def eliminar(self):
+    def eliminartabla(self):
         x = self.treeview.get_children()
         for item in x:
             self.treeview.delete(item)
 
 
     def actualizar_treeview(self):
-        self.eliminar()
+        self.eliminartabla()
 
         tabla = self
         while tabla != None:
@@ -65,7 +66,7 @@ class TablaSimbolos:
                     value.is_type = "Arreglo"
 
                 self.treeview.insert('', 'end', text=value.id,
-                                     value=[value.id,value.tipo, value.is_type, tabla.entorno, value.valor, value.fila,
+                                     value=[value.id,tabla.declaracionTipo ,value.getTipo().name, tabla.entorno, value.valor, value.fila,
                                             value.columna])
             tabla = tabla.anterior
 
