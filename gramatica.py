@@ -720,7 +720,7 @@ def parse(inp) :
     return parser.parse(inp)
 
 #INTERFAZ
-'''
+
 archivo=open("entrada.jpr","r")
 entrada=archivo.read()
 
@@ -783,7 +783,21 @@ for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FU
         Arbol_ast.getExcepciones().append(err)
         Arbol_ast.updateConsola(err.toString())
 
+init = NodoAST("RAIZ")
+instr = NodoAST("INSTRUCCIONES")
 
+for instruccion in Arbol_ast.getInstrucciones():
+    instr.Agregar_Hijo_Nodo(instruccion.getNodo())
+
+init.Agregar_Hijo_Nodo(instr)
+grafo = Arbol_ast.getDot(init) #DEVUELVE EL CODIGO GRAPHVIZ DEL AST
+
+dirname = os.path.dirname(__file__)
+direcc = os.path.join(dirname, 'ast.dot')
+arch = open(direcc, "w+")
+arch.write(grafo)
+arch.close()
+os.system('dot -T svg -o ast.svg ast.dot')
 
 print(Arbol_ast.getConsola())
 
@@ -874,3 +888,4 @@ def analizador(entrada,consola):
     
 def listaErrores():
     return errores
+'''

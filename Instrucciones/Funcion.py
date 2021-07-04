@@ -31,7 +31,7 @@ class Funcion(Instruccion):
 
             if isinstance(value, Return): # cuando encuetre un Return 
                 self.setTipo(value.getTipo()) # tomaria el tipo de lo que devuelve la funcion
-                return value.getNodo() # si encontro el return entonces devulve el valor que tenia el return
+                return value.result # si encontro el return entonces devulve el valor que tenia el return
 
         return None # por defecto
 
