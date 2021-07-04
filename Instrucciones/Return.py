@@ -22,7 +22,7 @@ class Return(Instruccion):
         #y se iguala al tipo de dato del return
         self.setTipo(self.getExpresion().getTipo())
         self.setResult(result )          # aqui se devuelve el valor en si, lo que se quiere devolver da la funcion o ciclo
-
+        self.result=result
         return self
 
 

@@ -17,6 +17,9 @@ class TablaSimbolos:
         else:
             self.tabla[simbolo.id] = simbolo
             # datos de la tabla
+            if simbolo.arreglo:
+                simbolo.tipo="Arreglo"
+
             self.treeview.insert('','end', text=str(simbolo.id),
             value=[simbolo.id,self.declaracionTipo,simbolo.getTipo().name, self.entorno, simbolo.getValor(), simbolo.getFila(), simbolo.getColumna()])
 
@@ -43,14 +46,26 @@ class TablaSimbolos:
             else:
                 tablaActual = tablaActual.anterior
         return Excepcion("Semantico", "Variable No encontrada en Asignacion", simbolo.getFila(), simbolo.getColumna())
-        
-    def getTablaCompleta(self):
-        tablaActual = self
-        while tablaActual != None:
-                      # RETORNA SIMBOLO
-            if tablaActual.tabla==None:
-                tablaActual = tablaActual.anterior
 
-            return tablaActual
-            
-        return None
+
+    def eliminar(self):
+        x = self.treeview.get_children()
+        for item in x:
+            self.treeview.delete(item)
+
+
+    def actualizar_treeview(self):
+        self.eliminar()
+
+        tabla = self
+        while tabla != None:
+
+            for value in tabla.tabla.values():
+                if value.arreglo:
+                    value.is_type = "Arreglo"
+
+                self.treeview.insert('', 'end', text=value.id,
+                                     value=[value.id,value.tipo, value.is_type, tabla.entorno, value.valor, value.fila,
+                                            value.columna])
+            tabla = tabla.anterior
+
