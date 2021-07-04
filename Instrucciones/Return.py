@@ -21,8 +21,10 @@ class Return(Instruccion):
         #pero en este caso se obtiene el tipo de dato que tiene la expresion 
         #y se iguala al tipo de dato del return
         self.setTipo(self.getExpresion().getTipo())
-              # aqui se devuelve el valor en si, lo que se quiere devolver da la funcion o ciclo
-        self.result=result
+
+        self.result=result         # aqui se devuelve el valor en si, lo que se quiere devolver da la funcion o ciclo
+
+
         return self
 
 
@@ -57,5 +59,6 @@ class Return(Instruccion):
         return self.tipo
 
     def setTipo(self, tipo):
+
         self.tipo=tipo
 

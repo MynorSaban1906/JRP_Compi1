@@ -561,6 +561,9 @@ def p_parametro(t) :
     'parametro     : tipo ID'
     t[0] = {'tipo':t[1],'identificador':t[2]}
 
+def p_parametroArreglo(t) :
+    'parametro     : tipo lista_Dimension ID'
+    t[0] = {'tipo':TIPO.ARREGLO,'identificador':t[3],'dimensiones':t[2],"tipo-arreglo":t[1]}
 
 
 #///////////////////////////////////////TIPO//////////////////////////////////////////////////
@@ -606,6 +609,8 @@ def p_parametrosLL_1(t) :
 def p_parametrosLL_2(t) :
     'parametros_llamada    : parametro_llamada'
     t[0] = [t[1]]
+
+
 
 #///////////////////////////////////////PARAMETRO LLAMADA A FUNCION//////////////////////////////////////////////////
 
@@ -783,7 +788,21 @@ for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FU
         Arbol_ast.getExcepciones().append(err)
         Arbol_ast.updateConsola(err.toString())
 
+init = NodoAST("RAIZ")
+instr = NodoAST("INSTRUCCIONES")
 
+for instruccion in Arbol_ast.getInstrucciones():
+    instr.Agregar_Hijo_Nodo(instruccion.getNodo())
+
+init.Agregar_Hijo_Nodo(instr)
+grafo = Arbol_ast.getDot(init) #DEVUELVE EL CODIGO GRAPHVIZ DEL AST
+
+dirname = os.path.dirname(__file__)
+direcc = os.path.join(dirname, 'ast.dot')
+arch = open(direcc, "w+")
+arch.write(grafo)
+arch.close()
+os.system('dot -T svg -o ast.svg ast.dot')
 
 print(Arbol_ast.getConsola())
 
