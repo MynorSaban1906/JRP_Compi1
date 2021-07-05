@@ -15,14 +15,17 @@ class TablaSimbolos:
         if simbolo.id in self.tabla :
             return Excepcion("Semantico", "Variable " + simbolo.id + " ya existe", simbolo.fila, simbolo.columna)
         else:
+            
             self.tabla[simbolo.id] = simbolo
             # datos de la tabla
-            if simbolo.arreglo:
-                simbolo.tipo="Arreglo"
+            self.declaracionTipo="VARIABLE"   
+            if simbolo.arreglo is True:
+                self.declaracionTipo="ARREGLO"
 
+            
             self.treeview.insert('','end', text=str(simbolo.id),
             value=[simbolo.id,self.declaracionTipo,simbolo.getTipo().name, self.entorno, simbolo.getValor(), simbolo.getFila(), simbolo.getColumna()])
-
+            self.actualizar_tablaGUI()
             return None
 
     def getTabla(self, id):            # obtener una variable
@@ -41,7 +44,7 @@ class TablaSimbolos:
                 if tablaActual.tabla[simbolo.id].getTipo()==simbolo.getTipo() or  tablaActual.tabla[simbolo.id].getTipo()==TIPO.NULO or simbolo.getTipo()==TIPO.NULO:
                     tablaActual.tabla[simbolo.id].setValor(simbolo.getValor())
                     tablaActual.tabla[simbolo.id].setTipo(simbolo.getTipo())
-                    self.actualizar_treeview()
+                    self.actualizar_tablaGUI()
                     return None
                 return Excepcion("Semantico", "Tipo de diferente en la variable " + simbolo.id , simbolo.fila, simbolo.columna)
             else:
@@ -55,15 +58,16 @@ class TablaSimbolos:
             self.treeview.delete(item)
 
 
-    def actualizar_treeview(self):
+    def actualizar_tablaGUI(self):
         self.eliminartabla()
 
         tabla = self
         while tabla != None:
 
             for value in tabla.tabla.values():
-                if value.arreglo:
-                    value.is_type = "Arreglo"
+                self.declaracionTipo="VARIABLE"   
+                if value.arreglo is True:
+                    self.declaracionTipo="ARREGLO"
 
                 self.treeview.insert('', 'end', text=value.id,
                                      value=[value.id,tabla.declaracionTipo ,value.getTipo().name, tabla.entorno, value.valor, value.fila,

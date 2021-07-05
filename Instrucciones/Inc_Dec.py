@@ -33,7 +33,7 @@ class Inc_Dec(Instruccion):
         
         if isinstance(result,Excepcion): return result
 
-
+        
         return simbolo.getValor()
 
 

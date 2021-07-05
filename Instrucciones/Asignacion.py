@@ -28,7 +28,7 @@ class Asignacion(Instruccion) :
 
         if isinstance(result, Excepcion): return result
         
-
+      
         return None
 
 

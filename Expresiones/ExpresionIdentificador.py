@@ -26,6 +26,7 @@ class ExpresionIdentificador(Instruccion) :
             self.tipo_arreglo=TIPO.ARREGLO
             
         self.tipo = simbolo.getTipo()
+        simbolo.declaracionTipo="VARIABLE"
         
         return simbolo.getValor()
 

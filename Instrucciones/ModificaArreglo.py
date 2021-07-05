@@ -36,7 +36,7 @@ class ModificaArreglo(Instruccion):
         # BUSQUEDA DEL ARREGLO
         value = self.modificarDimensiones(tree, table, copy.copy(self.getListaExpresion()), simbolo.getValor(), value)     #RETORNA EL VALOR SOLICITADO
         if isinstance(value, Excepcion): return value
-
+  
         return value
 
     def getNodo(self):
@@ -47,6 +47,7 @@ class ModificaArreglo(Instruccion):
             exp.Agregar_Hijo_Nodo(expresion.getNodo())
         nodo.Agregar_Hijo_Nodo(exp)
         nodo.Agregar_Hijo_Nodo(self.valor.getNodo())
+        
         return nodo
 
     def modificarDimensiones(self, tree, table, expresiones, arreglo, valor):

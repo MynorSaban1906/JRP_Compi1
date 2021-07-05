@@ -21,7 +21,7 @@ class Definicion(Instruccion) :
         result = table.setTabla(simbolo)
         
         if isinstance(result,Excepcion): return result
-        
+  
         return None
 
 

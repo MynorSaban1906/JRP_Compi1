@@ -26,7 +26,7 @@ class Round(Funcion):
 
         self.setTipo(TIPO.ENTERO) # se pasa el tipo de dato el cual siempre seria tipo entero
         
-        return round(simbolo.getValor())# se devuelve el valor ya redondeado "lista para imprimir" 
+        return self.my_round(simbolo.getValor())# se devuelve el valor ya redondeado "lista para imprimir" 
 
 
     def getNodo(self):
@@ -35,7 +35,12 @@ class Round(Funcion):
         
         return nodo
 
-
+    def my_round(self,num):
+        aux = num - int(num)
+        if aux >= 0.5:
+            return int(num) + 1
+        else:
+            return int(num)
 
 
 

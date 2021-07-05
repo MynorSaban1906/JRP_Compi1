@@ -1,0 +1,499 @@
+# SE TRABAJO CON UN ANALIZADOR ASCENDENTE
+
+
+# para la gramatica se utilizaron los siguientes terminales
+# Los cuales son las palabras reservadas del lenguaje
+
+**RPRINT
+**VAR
+**NULO
+**RINT
+**RDOUBLE
+**RSTRING
+**RBOOLEAN
+**RRETURN
+**RIF
+**RELSE
+**RTRUE
+**RFALSE
+**RWHILE
+**RBREAK
+**RFOR
+**RSWITCH
+**RCASE
+**DEFAULT
+**RMAIN
+**RFUNC
+**RCONTINUE
+**RREAD
+**RCHAR
+**RNEW
+
+
+# tambien se pueden encontrar como TERMINALES LOS SIGUIENTES SIMBOLOS
+
+COMA       = ,
+PUNTOCOMA  = ;
+CORIZQ     = [
+CORDER     = ]
+LLAIZQ     = {
+LLADER     = }
+PARIZQ     = (
+PARDER     = )
+DOSPUNTOS  = :
+COMSIMPLE  = '
+COMDOBLE   = "
+MUL        = *
+DIV        = /
+MAS        = +
+MENOS      = -
+MODULO     = %
+AND        = &&
+OR         = ||
+IGUAL      =  =
+ADMI       =  !
+
+
+
+
+
+
+
+
+
+
+
+#Gramatica del programa
+
+# GRAMATICA INICIAL  ->  So
+            init            : instrucciones
+
+
+# instrucciones que derivan en instrucciones o instruccion
+# lo cual es insrucciones de instrucciones nuestro programa
+
+            instrucciones    :      instrucciones instruccion
+                                ->   instruccion
+
+
+
+# estas son todas las instrucciones que se hacen en todo el programa
+# las instrucciones derivan en una instruccion que genera una accion 
+# cada instruccion se explicara mas adelante
+# en cada produccion hay TERMINALES Y NO TERMINALES
+
+            instruccion      :      imprimir_instr final   
+                                ->   definicion_instr final
+                                ->   asignacion_instr final
+                                ->   if_instr
+                                ->   break_instr final
+                                ->   while_instr
+                                ->   inc_dec final
+                                ->   for_instr
+                                ->   switch_instr
+                                ->   main_instr
+                                ->   funcion_instr 
+                                ->   llamadaFuncion final
+                                ->   return_instr final
+                                ->   continue_instr final
+                                ->   definicionArreglo_instr final
+                                ->   modificacionArreglo_instr final
+
+
+
+# produccion **final** esta su unica labor es verificar
+# si cada una de las instrucciones-producciones terminan en 
+# un punto y coma o no 
+
+            final      :    PTCOMA
+                            -> # para este caso seria epsilon
+
+
+    
+# esta es una produccion por defecto, la cual detecta cualquier
+# error lexico que exista en la entrada
+
+            instruccion      :  error final
+
+
+# esta produccion ** imprimir_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase 
+#       PRINT ( EXPRESION )
+
+
+            imprimir_instr   : PRINT PARIZQ expresion PARDER
+
+
+
+# para el caso de la produccion **definicion_instr**
+# se tienen dos formas de declaracion de variables 
+# entonces se crea esta produccion para que tenga
+# que elegir entre los NO TERMINALES
+
+            definicion_instr     :  definicion_instr1
+
+                                 ->  definicion_instr2
+
+
+# para esta produccion **definicion_instr1**
+# seria del tipo    
+        # VAR IDENTIFICADOR = EXPRESION
+
+            definicion_instr1   :   VAR ID IGUAL expresion
+
+
+# para esta produccion **definicion_instr2**
+# seria del tipo  VAR IDENTIFICADOR
+# la cual no esta igualada a ninguna expresion 
+
+
+            definicion_instr2   :   VAR ID 
+
+
+
+# esta produccion ** asignacion_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase asignacion
+#       IDENTIFICADOR = EXPRESION
+
+            asignacion_instr   :  ID IGUAL expresion
+
+
+
+# esta produccion ** if_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase asignacion
+# pero esta produccion ya tiene tres posibilidades porque puede variar segun sus NO TERMINALES
+# recordando que la sentencia IF se compone por un ELSE IF y un ELSE
+# Por ende se separa para poder entender y que el lenguaje 
+# distinga la diferencia entre ellos
+
+#       IF ( EXPRESION ){ INSTRUCCIONES }
+#       ELSE IF ( EXPRESIONES ) { INSTRUCCIONES }
+#       ELSE { INSTRUCCIONES }  
+
+                    
+                            # SOLAMENTE PARA LA SENTENCIA IF
+
+            if_instr    :   RIF PARIZQ expresion PARDER LLAIZQ instrucciones LLADER  
+                        
+                            # SOLAMENTE PARA LA SENTENCIA IF Y IF ELSE
+
+                        ->   RIF PARIZQ expresion PARDER LLAIZQ instrucciones LLADER RELSE LLAIZQ instrucciones LLADER
+                       
+                            # ESTA ES PARA TODA LA SENTENCIA QUE VENGA IF - ELSE Y ELSE IF
+    
+                        ->   RIF PARIZQ expresion PARDER LLAIZQ instrucciones LLADER RELSE if_instr
+
+
+
+# esta produccion ** break_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# para poder salir de donde se invoco el break
+# para este caso solo se uso el TERMINAL 
+
+#           BREAK
+
+
+            break_instr     : RBREAK
+
+
+
+
+# esta produccion ** while_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase While para realizar el ciclo respectivo
+
+#           WHILE ( EXPRESION ) { INSTRUCCIONES }
+
+
+            while_instr     : RWHILE PARIZQ expresion PARDER LLAIZQ instrucciones LLADER
+            
+
+
+
+
+
+# esta produccion ** inc_dec_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase y poder realizar el aumento o decremento respectivo
+#           IDENTIFICADOR ++
+#           IDENTIFICADOR --
+
+
+            inc_dec     :   ID AUMENTO  
+                          ->   ID DECRECI
+
+
+
+# esta produccion ** for_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase FOR para realizar el ciclo respectivo
+# para realizar la produccion del ciclo for es dividirlo 
+# para que sea mas sencillo y no llegar a una gramatica ambigua y sin recursividad infinita
+
+# tener la produccion For segun su forma # FOR ( ( DECLARACION / ASINGACION ) ; EXPRESION ; PASOFOR ) { INSTRUCCIONES }
+           
+            for_instr     : RFOR PARIZQ inicial_for PTCOMA expresion PTCOMA inc_dec_for PARDER LLAIZQ  instrucciones LLADER
+
+#  ahora se realiza la produccion inicial_for que llevara ** ASINGACION O DECLARACION **  algo que ya habiamos explicado, solo se coloca los NO TERMINALES
+
+            inicial_for  :     definicion_instr1
+                          ->  asignacion_instr
+
+
+#  ahora se realiza la produccion **INC_DEC_FOR**  que llevara **ASIGNACION O INCREMENTO_DECREMTO**
+#  algo que ya habiamos explicado, solo se coloca los NO TERMINALES para que se dirija a esa produccion
+
+
+            inc_dec_for     :   inc_dec
+                            ->   asignacion_instr
+
+
+
+
+# esta produccion ** switch_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase switch y case  para poder evaluar sus casos respectivos
+# para realizar la produccion de la sentencia switch en dos partes un SWITCH y un CASE
+# para que sea mas sencillo y no llegar a una gramatica ambigua y sin recursividad infinita
+
+# tener la produccion SWITCH segun su forma # SWITCH ( EXPRESION ) { [LISTA DE CASOS] DEFAULT }
+ # RECORDANDO QUE UN SWITCH puede tener tres variabntes las cuales son:
+                        # puede venir una lista de casos y un default
+                        # puede venir una lista de casos y no default
+                        # puede venir solo un default
+
+
+#           switch (EXPRESION):
+#                               CASE EXPRESION : INSTRUCCIONES
+#                               DEFAULT: INSTRUCCIONES
+
+
+            switch_instr     :      RSWITCH PARIZQ expresion PARDER LLAIZQ cases_lista LLADER
+                                ->   RSWITCH PARIZQ expresion PARDER LLAIZQ cases_lista  defecto LLADER
+                                ->   RSWITCH PARIZQ expresion PARDER LLAIZQ defecto LLADER
+
+
+
+#  ahora se realiza la produccion lista_clases que llevara que llevara todas las clases posibles
+#  estas son las mas  importantes para poder realizar la sentencia SWITCH
+
+
+            cases_lista    : case
+
+            case     :   RCASE expresion DPUNTOS instrucciones
+
+
+#  ahora se realiza la produccion **defecto** ese puede o no venir 
+# entonces este seria su produccion
+
+
+            defecto      : DEFAULT DPUNTOS instrucciones
+
+
+
+
+# esta produccion ** main_instr **
+# siendo esta la de mayor importancia ya que dentro de esta
+# palabra reservada se ejecuta todo lo de nuestro programa 
+# entonces se lleva a la siguientes produccion
+
+#               MAIN ( ) { INSTRUCCIONES }
+
+
+            main_instr     : RMAIN PARIZQ PARDER LLAIZQ instrucciones LLADER
+
+
+
+
+
+# esta produccion ** funcion_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase funcion, pero una de sus particularidades
+# es de que una funcion puede tener parametros o no, esto es donde la funcion se 
+# derifa en mas de dos producciones veamos el ejemplo
+
+# func hola(int valor1, string nombre){ INSTRUCCIONES }
+
+# func hola() { INSTRUCCIONES }
+
+
+# Entonces para satisfacer la necesidad se crea la siguiente produccion
+
+
+                                    # funcion con parametros
+            funcion_instr  :    RFUNC ID PARIZQ parametros PARDER LLAIZQ instrucciones LLADER
+                            
+                                    # funcion sin parametros
+                            ->   RFUNC ID PARIZQ  PARDER LLAIZQ instrucciones LLADER
+
+
+# ahora para los parametros se realizo una lista de parametros en donde puede venir de
+# cualquier tipo,
+
+
+
+            parametros     : parametros COMA parametro
+                            ->  parametro
+
+# en los parametros pueden venir de dos tipos los cuales arreglos
+# o tambien pueden ser de tipo primitivo
+
+            parametro     :     tipo ID
+                          ->     tipo lista_Dimension ID 
+
+
+# para la lista de dimensiones es una lista como su nombre lo indica
+# para poder guardar las dimensiones que tiene el arreglo como parametro
+# la produccion [ ] debe de sumar un uno al contador de lista parametros
+# para asi saber de cuantas dimensiones es el arreglo que se esta pasando como parametro
+
+
+            lista_Dimension     :   lista_Dimension CORIZQ  CORDER
+                                ->   CORIZQ  CORDER
+
+
+
+
+# esta produccion ** llamadaFuncion **
+# lo que hace esperar que haga match para poder enviar los datos 
+# necesarios para la clase invocacionFUncion, pero una de sus particularidades
+# es de que la llamada a la funcion puede tener parametros o no, esto es donde la funcion se 
+# derifa en dos producciones veamos el ejemplo
+
+#           holaMunod()
+
+#           holaMundo("Mynor", 201800516)
+
+# para este caso se realizo la siguientes producciones
+
+                                # llamada sin parametros
+            llamadaFuncion  :   ID PARIZQ PARDER
+
+                                # llamada con parametros
+                            ->   ID PARIZQ parametros_llamada PARDER
+
+
+# para realizar la llamada con parametros se reliza una lista de parametros
+# que conformarian los parametros, esta asu vez debe de verificar su tipo con la funcion
+# a que se hace referencia
+
+                                            # para mas de un parametro en la llamada
+            parametros_llamada     :    parametros_llamada COMA parametro_llamada
+
+                                            # para solo un parametro en la llmada de la funcion
+                                    ->   parametro_llamada
+
+
+# pero el parametro llamada debe saber a que se refiere que TIPO DE DATO es  entonces
+# se crea la siguiente produccion, la cual es una expresion
+
+
+            parametro_llamada     : expresion
+
+
+
+
+
+# esta produccion ** continue_instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# para poder salir de donde se invoco el CONTINUE
+# para este caso solo se uso el TERMINAL 
+
+#           CONTINUE
+
+
+            continue_instr     : RCONTINUE
+
+
+
+# esta produccion ** return _instr **
+# lo que hace esperar que haga match para poder enviar los datos 
+# para poder salir de donde se invoco la clase RETURN
+# para este caso solo se uso el TERMINAL 
+
+#           RETURN expresion
+
+
+            return_instr     : RRETURN expresion
+
+
+
+
+
+
+
+
+
+# como se ve mucho en las producciones un NO TERMINAL 
+# EXPRESION, ahora se explica que el terminal es cualquier
+# variable esta puese realizar 
+        # #operaiones artimeticas
+        # operaciones relacionales
+        # operaciones logicas
+# pero tambien puede identificar a cada variable
+# las cuales pueden ser de tipo 
+        # char
+        # string
+        # int
+        # double
+        # booleano
+        # null
+
+# a continuacion las producciones
+
+        expresion : expresion MAS expresion
+                -> expresion MENOS expresion
+                -> expresion POR expresion
+                -> expresion DIVIDIDO expresion
+                -> expresion MENQUE expresion
+                -> expresion MAYQUE expresion
+                -> expresion IGUALIGUAL expresion
+                -> expresion POW expresion
+                -> expresion MENIGUAL expresion
+                -> expresion MAYIGUAL expresion
+                -> expresion MODULO expresion
+                -> expresion DIFERENTE expresion
+                -> expresion AND expresion
+                -> expresion OR expresion
+
+
+# ahora se sabe que las producciones anteriores tiene 
+# recursividad por la izquierda entonces para eliminar eso 
+# se agregan su simbolos TERMINALES 
+# los cuales se dejan las siguientes producciones
+
+# esta expresion es para el menos unario de alguna expresion en particular
+            expresion   :   MENOS expresion %prec UMENOS 
+                        ->   NOT expresion %prec UNOT 
+
+
+# ahora se colocaran las expresiones con los valores primitivos
+# estos ayudaran a quitar la recursividad 
+
+            expresion   :   PARIZQ expresion PARDER
+                        ->   ENTERO
+                        ->   DECIMAL
+                        ->   CADENA
+                        ->   CHAR
+                        ->   NULO
+                        ->   RTRUE
+                        ->   RFALSE
+                        ->   ID
+
+# tambien existen las EXPRESIONES que pueden tener otros tipos de 
+# estas pueden apuntar a otras producciones que se mencionaron antes o
+# a funciones que solo de esa manera se puede acceder a ella
+# valores los cuales se colocan sus producciones
+
+
+
+            expresion   :   llamadaFuncion # anteriormente se explico esta produccion 
+                        ->   RREAD PARIZQ PARDER # Esta es la llamada de una funcion llamada read () , solo de esta manera se puede acceder a dicha funcion
+
+
+
+
+

@@ -104,11 +104,11 @@ class GUI:
        # self.Entrada = scrolledtext.ScrolledText(self.window,width=80,height=25)   # textArea Entrada
 
         self.Entrada= TextoAccion(self.Entrada)
-        self.Entrada.place(x=50, y = 50) 
+        self.Entrada.place(x=20, y = 50) 
 
 
         self.Consola = scrolledtext.ScrolledText(self.window,width=70,height=23, background="black")   # textConsola area para la consola 
-        self.Consola.place(x=750, y =50) 
+        self.Consola.place(x=710, y =50) 
         self.Consola.config(fg="lawn green",bg="gray20")   
 
         self.simbolot = Label(self.window, text="Tabla de Simbolos", font=("Times New Roman", 13), bg='turquoise1')

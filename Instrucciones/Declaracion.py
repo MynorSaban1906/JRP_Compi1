@@ -23,6 +23,7 @@ class Declaracion(Instruccion):
 
         if isinstance(result, Excepcion): return result
         self.tipo=simbolo.getTipo()  # AUN ESTA EN PRUEBA
+  
         return None
 
 

@@ -86,3 +86,20 @@ class Arbol:
 
             print(hijo.valor)
             self.dot += nombreHijo + "[label=\"" + hijo.getValor().replace("\"", "\\\"") + "\"];\n"
+
+    def recorrerAST(self, idPadre, nodoPadre):
+        for hijo in nodoPadre.getNodos_Hijos():
+            nombreHijo = "n" + str(self.contador)
+
+            print(hijo.getValor())
+            try:
+                self.dot += nombreHijo + "[label=\"" + hijo.valor.replace("\"", "\\\"") + "\"];\n"
+            except:
+                self.dot += nombreHijo + "[label=\"" + str(hijo.valor)+ "\"];\n"
+
+            print(hijo.valor)
+            self.dot += nombreHijo + "[label=\"" + hijo.getValor().replace("\"", "\\\"") + "\"];\n"
+
+            self.dot += idPadre + "->" + nombreHijo + ";\n"
+            self.contador += 1
+            self.recorrerAST(nombreHijo, hijo) 

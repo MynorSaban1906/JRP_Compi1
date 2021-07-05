@@ -24,7 +24,6 @@ class Imprimir(Instruccion):
         if self.expresion.tipo == TIPO.NULO:
             return Excepcion("Semantico", "No se puede imprimir un valor Null", self.fila, self.columna)
 
-
         tree.updateConsola(value)
 
     def getNodo(self):

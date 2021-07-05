@@ -1,4 +1,5 @@
 
+from TablaArbol.Simbolo import Simbolo
 from TablaArbol.NodoAST import NodoAST
 from Instrucciones.Funcion import Funcion
 from TablaArbol.Tipo import TIPO
@@ -20,13 +21,16 @@ class Length(Funcion):
         if simbolo ==None:
             return Excepcion("Semantico", "No se encontro el parametro de la funcion Length ", simbolo.getFila(),simbolo.getColumna())
 
+        if isinstance(simbolo.valor,list):
+            self.setTipo(TIPO.ENTERO)
+            return len(simbolo.valor)
+            
         if simbolo.getTipo() not in(TIPO.ARREGLO, TIPO.CADENA): # si no es igual al tipo entero o decimal este entraria en un error
             return Excepcion("Semantico", "No se puede usar la funcion Length  "  , simbolo.getFila(),simbolo.getColumna())
 
 
         self.setTipo(TIPO.ENTERO) # se pasa el tipo de dato el cual siempre seria tipo entero
-        if simbolo.getTipo()==TIPO.ARREGLO:
-            pass
+      
 
         return len(simbolo.getValor())# se devuelve el valor ya redondeado "lista para imprimir" 
 

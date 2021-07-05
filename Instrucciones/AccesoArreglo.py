@@ -32,7 +32,6 @@ class AcessoArreglo(Instruccion):
 
         if isinstance(Arreglo,List) :return Excepcion("Semantico", self.identificador +" No es un arreglo ", self.getFila(), self.getColumna() )
       
-      
         return Arreglo
 
 
@@ -92,3 +91,10 @@ class AcessoArreglo(Instruccion):
 
     def setListaExpresion(self, arreglo):
         self.listaexpresion=arreglo
+
+
+    def getTipo(self):
+        return self.tipo
+
+    def setTipo(self, tipo):
+        self.tipo=tipo

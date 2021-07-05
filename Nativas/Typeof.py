@@ -19,12 +19,12 @@ class Typeof(Funcion):
         if simbolo ==None:
             return Excepcion("Semantico", "No se encontro el parametro de TypeOf ", self.getFila(),self.getColumna())
 
-        self.setTipo(TIPO.CADENA) # se pasa el tipo de dato el cual siempre seria tipo cadena
-        
-        if simbolo.getTipo().name =='ARREGLO': # por si viene un tipo arreglo buscaria el tipo del arreglo
-            pass
+        if isinstance(simbolo.valor,list):
+            self.setTipo("ARREGLO -> " + self.simb(simbolo.getTipo().name))
+        else:
+            self.setTipo(self.simb(simbolo.getTipo().name)) # se pasa el tipo de dato el cual siempre seria tipo cadena
     
-        return str(simbolo.getTipo().name) # se devuelve el valor ya tuncado por la funcion math.trunc 
+        return str(self.getTipo()) # se devuelve el valor ya tuncado por la funcion math.trunc 
 
     def getNodo(self):
         nodo=NodoAST("TYPEOF")
@@ -32,7 +32,21 @@ class Typeof(Funcion):
 
         return nodo
 
-
+    def simb(self,tipo):
+        if tipo=="ENTERO":
+            return "Int"
+        elif tipo=="CADENA":
+            return "String"
+        elif tipo=="BOOLEANO":
+            return "Booleano"
+        elif tipo=="CHARACTER":
+            return "Char"
+        elif tipo=="NULO":
+            return "Null"
+        elif tipo=="ARREGLO":
+            return "ARREGLO"
+        elif tipo=="DECIMAL":
+            return "Double"
 
     def getIdentificador(self):
         return self.identificador

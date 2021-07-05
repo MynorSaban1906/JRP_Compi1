@@ -1,6 +1,7 @@
 # aqui estan todos los tipos de datos que se pueden usar dentro del compilador
 
 from enum import Enum
+from tkinter import Variable
 
 class TIPO(Enum):
     ENTERO = 1
@@ -11,6 +12,8 @@ class TIPO(Enum):
     NULO = 6
     ARREGLO = 7
     ID=8
+    Funcion=9
+    VARIABLE=10
 
 class OperadorAritmetico(Enum):
     MAS = 1

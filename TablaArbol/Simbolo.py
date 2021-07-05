@@ -49,5 +49,5 @@ class Simbolo:
     def getDimension(self):
         return self.dimension
 
-    def setFila(self, dimension):
+    def setDimension(self, dimension):
         self.dimension=dimension

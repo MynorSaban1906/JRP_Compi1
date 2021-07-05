@@ -36,12 +36,27 @@ class InvocaFuncion(Instruccion):
                     simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'],self.arreglo, self.getFila(), self.getColumna(),resultadoExpresion)
                     result=nuevaTabla.setTabla(simbolo)
                     if isinstance(result,Excepcion): return result
+                    
 
-                elif funcion.parametros[contador]['tipo-arreglo']== expresion.getTipo() and funcion.parametros[contador]['tipo']== TIPO.ARREGLO:
-                    arregloGuardado = table.getTabla(expresion.getIdentificador())
+                elif funcion.parametros[contador]['tipo']== TIPO.ARREGLO:
+                    arregloGuardado = table.getTabla(expresion.getIdentificador().lower()) # mando a interpretar para que me devuelva el arreglo que se envio en la llamada funcion
 
-                    if funcion.parametros[contador]['dimensiones'] != len(arregloGuardado.getValor()):   #VERIFICACION DE DIMENSIONES
-                        return Excepcion("Semantico", "Dimensiones diferentes en Arreglo.", self.getFila(), self.getColumna() )
+                    if arregloGuardado is None:
+                        return Excepcion("Semantico", "Arreglo "+ str(expresion.getIdentificador()) +" no fue encontrada.", self.getFila(), self.getColumna() )
+
+                    if arregloGuardado.getArreglo() is False:
+                        return Excepcion("Semantico",str( expresion.getIdentificador())+" No es un Arreglo.", self.getFila(), self.getColumna() )
+
+                    if funcion.parametros[contador]['dimensiones'] != arregloGuardado.getDimension():   #VERIFICACION DE DIMENSIONES
+                        return Excepcion("Semantico", "Dimensiones diferentes parametro Arreglo.", self.getFila(), self.getColumna() )
+
+                    #creacion de simbolo e ingresandolo a la tabla de simbolo
+                    simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo-arreglo'],True, self.getFila(), self.getColumna(),resultadoExpresion)
+                    
+                    resultTabla=nuevaTabla.setTabla(simbolo)
+
+                    if isinstance(resultTabla,Excepcion): return resultTabla
+                    
 
                     print("arreglo")
                 else:
@@ -50,7 +65,7 @@ class InvocaFuncion(Instruccion):
                         simbolo = Simbolo(str(funcion.parametros[contador]['identificador']).lower(), funcion.parametros[contador]['tipo'],self.arreglo, self.getFila(), self.getColumna(),resultadoExpresion)
                         resultTabla=nuevaTabla.setTabla(simbolo)
                         if isinstance(resultTabla,Excepcion): return resultTabla
-
+                        
                     
                     else:
                         return Excepcion("Semantico", "Tipo Diferente en los parametros de llamada ", self.getFila(), self.getColumna())

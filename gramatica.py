@@ -825,7 +825,7 @@ def analizador(entrada,consola,tablaGUI):
 
 
     for instruccion in Arbol_ast.getInstrucciones():      # 1ERA PASADA (DECLARACIONES Y ASIGNACIONES)
-        if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)or isinstance(instruccion, DeclaraArreglo):
+        if isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion) or isinstance(instruccion, DeclaraArreglo) or isinstance(instruccion, AcessoArreglo) or isinstance(instruccion,ModificaArreglo):
             value = instruccion.interpretar(Arbol_ast,TablaSimboloGlobal)
             if isinstance(value, Excepcion) :
                 Arbol_ast.getExcepciones().append(value)
@@ -863,21 +863,20 @@ def analizador(entrada,consola,tablaGUI):
                 err = Excepcion("Semantico", "Sentencia Continue fuera de un ciclo", instruccion.fila, instruccion.columna)
                 Arbol_ast.getExcepciones().append(err)
                 Arbol_ast.updateConsola(err.toString())
-
+                
 
 
     for instruccion in Arbol_ast.getInstrucciones():    # 3ERA PASADA (SENTENCIAS FUERA DE MAIN)
         if not (isinstance(instruccion, Main) or isinstance(instruccion, Declaracion) or isinstance(instruccion, Asignacion) or isinstance(instruccion, Definicion)
-                or isinstance(instruccion, Funcion) or isinstance(instruccion,DeclaraArreglo)):
+                or isinstance(instruccion, Funcion) or isinstance(instruccion,DeclaraArreglo)or isinstance(instruccion, AcessoArreglo) or isinstance(instruccion,ModificaArreglo)):
             err = Excepcion("Semantico", "Sentencias fuera de Main", instruccion.fila, instruccion.columna)
             Arbol_ast.getExcepciones().append(err)
             Arbol_ast.updateConsola(err.toString())
 
-            
-
+    
     init = NodoAST("RAIZ")
     instr = NodoAST("INSTRUCCIONES")
-
+    import webbrowser
     for instruccion in Arbol_ast.getInstrucciones():
         instr.Agregar_Hijo_Nodo(instruccion.getNodo())
 
@@ -889,8 +888,8 @@ def analizador(entrada,consola,tablaGUI):
     arch = open(direcc, "w+")
     arch.write(grafo)
     arch.close()
-    os.system('dot -T svg -o ast.svg ast.dot')
-
+    os.system('dot -T svg -o arbol.svg ast.dot')
+    webbrowser.open_new_tab('arbol.svg')
 
 
     return Arbol_ast.getConsola()
